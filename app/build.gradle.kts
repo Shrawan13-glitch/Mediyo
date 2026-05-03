@@ -35,9 +35,9 @@ android {
             isShrinkResources = true
             isCrunchPngs = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            val releaseStoreFile = System.getenv("KEYSTORE_FILE")
-            if (releaseStoreFile != null && System.getenv("KEYSTORE_PASSWORD") != null) {
-                signingConfig = signingConfigs.getByName("release")
+            val releaseConfig = signingConfigs.findByName("release")
+            if (releaseConfig?.storeFile != null) {
+                signingConfig = releaseConfig
             }
         }
         debug {
@@ -65,19 +65,23 @@ android {
     
     signingConfigs {
         getByName("debug") {
-            if (System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD") != null) {
-                storeFile = file(System.getenv("MUSIC_DEBUG_KEYSTORE_FILE"))
-                storePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
+            val debugStoreFile = System.getenv("MUSIC_DEBUG_KEYSTORE_FILE")
+            val debugStorePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
+            if (debugStoreFile != null && debugStorePassword != null) {
+                storeFile = file(debugStoreFile)
+                storePassword = debugStorePassword
                 keyAlias = "debug"
-                keyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD")
+                keyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD") ?: debugStorePassword
             }
         }
-        create("release") {
-            if (System.getenv("KEYSTORE_FILE") != null) {
-                storeFile = file(System.getenv("KEYSTORE_FILE"))
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("KEY_ALIAS")
-                keyPassword = System.getenv("KEY_PASSWORD")
+        maybeCreate("release").apply {
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+            if (keystoreFile != null && keystorePassword != null) {
+                storeFile = file(keystoreFile)
+                storePassword = keystorePassword
+                keyAlias = System.getenv("KEY_ALIAS") ?: "release"
+                keyPassword = System.getenv("KEY_PASSWORD") ?: keystorePassword
             }
         }
     }
