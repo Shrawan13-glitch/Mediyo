@@ -15,6 +15,7 @@ import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import com.shrawan.mediyo.innertube.NewPipeUtils
 import com.shrawan.mediyo.innertube.YouTube
+import com.shrawan.mediyo.innertube.models.YouTubeClient
 import com.shrawan.mediyo.music.constants.AudioQuality
 import com.shrawan.mediyo.music.constants.AudioQualityKey
 import com.shrawan.mediyo.music.db.MusicDatabase
@@ -54,6 +55,12 @@ class DownloadUtil @Inject constructor(
                     OkHttpClient.Builder()
                         .proxy(YouTube.proxy)
                         .build()
+                ).setDefaultRequestProperties(
+                    mapOf(
+                        "User-Agent" to YouTubeClient.USER_AGENT_WEB_PUBLIC,
+                        "Origin" to "https://music.youtube.com",
+                        "Referer" to "https://music.youtube.com/",
+                    )
                 )
             )
     ) { dataSpec ->
@@ -110,9 +117,13 @@ class DownloadUtil @Inject constructor(
         }
 
         val streamUrl =
-            NewPipeUtils.getStreamUrl(format, mediaId).getOrNull()
-                ?: format.url
-                ?: throw PlaybackException(playerResponse.playabilityStatus.reason, null, PlaybackException.ERROR_CODE_REMOTE_ERROR)
+            NewPipeUtils.getStreamUrl(format, mediaId).getOrElse { throwable ->
+                throw PlaybackException(
+                    playerResponse.playabilityStatus.reason ?: throwable.message,
+                    throwable,
+                    PlaybackException.ERROR_CODE_REMOTE_ERROR
+                )
+            }
 
         songUrlCache[mediaId] =
             streamUrl to (System.currentTimeMillis() + playerResponse.streamingData!!.expiresInSeconds * 1000L)

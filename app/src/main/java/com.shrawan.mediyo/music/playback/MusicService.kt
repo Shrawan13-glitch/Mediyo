@@ -24,6 +24,7 @@ import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.Timeline
 import androidx.media3.common.audio.SonicAudioProcessor
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.ResolvingDataSource
@@ -52,6 +53,7 @@ import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
 import com.shrawan.mediyo.innertube.YouTube
 import com.shrawan.mediyo.innertube.NewPipeUtils
+import com.shrawan.mediyo.innertube.models.YouTubeClient
 import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.models.WatchEndpoint
 import com.shrawan.mediyo.innertube.models.response.PlayerResponse
@@ -98,6 +100,7 @@ import com.shrawan.mediyo.music.playback.queues.ListQueue
 import com.shrawan.mediyo.music.playback.queues.Queue
 import com.shrawan.mediyo.music.playback.queues.YouTubeQueue
 import com.shrawan.mediyo.music.playback.queues.filterExplicit
+import com.shrawan.mediyo.music.utils.AppLogs
 import com.shrawan.mediyo.music.utils.CoilBitmapLoader
 import com.shrawan.mediyo.music.utils.DiscordRPC
 import com.shrawan.mediyo.music.utils.dataStore
@@ -191,6 +194,8 @@ class MusicService : MediaLibraryService(),
     private var isAudioEffectSessionOpened = false
 
     private var discordRpc: DiscordRPC? = null
+    private val songUrlCache = HashMap<String, Pair<String, Long>>()
+    private val retriedForbiddenMediaIds = hashSetOf<String>()
 
     override fun onCreate() {
         super.onCreate()
@@ -589,7 +594,35 @@ class MusicService : MediaLibraryService(),
     }
 
     override fun onPlayerError(error: PlaybackException) {
+        val currentMediaId = player.currentMediaItem?.mediaId
+        AppLogs.declare(
+            this,
+            "Playback",
+            "Player error for mediaId=${currentMediaId ?: "unknown"} code=${error.errorCode} message=${error.message.orEmpty()}",
+            error
+        )
         reportException(error)
+        if (currentMediaId != null && isForbiddenStreamError(error) && retriedForbiddenMediaIds.add(currentMediaId)) {
+            AppLogs.declare(this, "Playback", "Retrying forbidden stream for $currentMediaId after a 403 response")
+            scope.launch(Dispatchers.IO) {
+                try {
+                    playerCache.removeResource(currentMediaId)
+                    downloadCache.removeResource(currentMediaId)
+                } catch (e: Exception) {
+                    reportException(e)
+                }
+                songUrlCache.remove(currentMediaId)
+                withContext(Dispatchers.Main) {
+                    val currentPosition = player.currentPosition
+                    val currentIndex = player.currentMediaItemIndex
+                    player.stop()
+                    player.seekTo(currentIndex, currentPosition)
+                    player.prepare()
+                    player.playWhenReady = true
+                }
+            }
+            return
+        }
         if (dataStore.get(AutoSkipNextOnErrorKey, false) &&
             isInternetAvailable(this) &&
             player.hasNextMediaItem()
@@ -613,6 +646,12 @@ class MusicService : MediaLibraryService(),
                                 OkHttpClient.Builder()
                                     .proxy(YouTube.proxy)
                                     .build()
+                            ).setDefaultRequestProperties(
+                                mapOf(
+                                    "User-Agent" to YouTubeClient.USER_AGENT_WEB_PUBLIC,
+                                    "Origin" to "https://music.youtube.com",
+                                    "Referer" to "https://music.youtube.com/",
+                                )
                             )
                         )
                     )
@@ -621,7 +660,6 @@ class MusicService : MediaLibraryService(),
             .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
 
     private fun createDataSourceFactory(): DataSource.Factory {
-        val songUrlCache = HashMap<String, Pair<String, Long>>()
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
             val mediaId = dataSpec.key ?: error("No media id")
 
@@ -694,9 +732,11 @@ class MusicService : MediaLibraryService(),
             scope.launch(Dispatchers.IO) { recoverSong(mediaId, playerResponse) }
 
             val streamUrl =
-                NewPipeUtils.getStreamUrl(format, mediaId).getOrNull()
-                    ?: format.url
-                    ?: throw PlaybackException(getString(R.string.error_no_stream), null, ERROR_CODE_NO_STREAM)
+                NewPipeUtils.getStreamUrl(format, mediaId).getOrElse { throwable ->
+                    AppLogs.declare(this@MusicService, "Playback", "Stream URL resolution failed for $mediaId", throwable)
+                    reportException(throwable)
+                    throw PlaybackException(getString(R.string.error_no_stream), throwable, ERROR_CODE_NO_STREAM)
+                }
 
             songUrlCache[mediaId] =
                 streamUrl to (System.currentTimeMillis() + playerResponse.streamingData!!.expiresInSeconds * 1000L)
@@ -770,6 +810,20 @@ class MusicService : MediaLibraryService(),
         }.onFailure {
             reportException(it)
         }
+    }
+
+    private fun isForbiddenStreamError(error: PlaybackException): Boolean {
+        val cause = error.cause
+        if (cause is HttpDataSource.InvalidResponseCodeException && cause.responseCode == 403) {
+            return true
+        }
+        val message = buildString {
+            append(error.message.orEmpty())
+            append(' ')
+            append(cause?.message.orEmpty())
+        }
+        return error.errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS &&
+            message.contains("403", ignoreCase = true)
     }
 
     override fun onDestroy() {

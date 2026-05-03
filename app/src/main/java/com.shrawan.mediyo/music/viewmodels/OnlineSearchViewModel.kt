@@ -13,6 +13,7 @@ import com.shrawan.mediyo.innertube.models.filterExplicit
 import com.shrawan.mediyo.innertube.pages.SearchSummaryPage
 import com.shrawan.mediyo.music.constants.HideExplicitKey
 import com.shrawan.mediyo.music.models.ItemsPage
+import com.shrawan.mediyo.music.utils.AppLogs
 import com.shrawan.mediyo.music.utils.dataStore
 import com.shrawan.mediyo.music.utils.get
 import com.shrawan.mediyo.music.utils.reportException
@@ -48,6 +49,7 @@ class OnlineSearchViewModel @Inject constructor(
             }
             .onFailure {
                 summaryError = it
+                AppLogs.declare(context, "Search", "All tab summary failed for query=\"$query\"", it)
                 reportException(it)
             }
     }
@@ -71,6 +73,7 @@ class OnlineSearchViewModel @Inject constructor(
                             }
                             .onFailure {
                                 summaryError = it
+                                AppLogs.declare(context, "Search", "Filtered search failed for query=\"$query\" filter=${filter.value}", it)
                                 reportException(it)
                             }
                     }
