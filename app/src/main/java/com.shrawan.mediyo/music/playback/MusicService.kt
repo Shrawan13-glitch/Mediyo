@@ -51,6 +51,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
 import com.shrawan.mediyo.innertube.YouTube
+import com.shrawan.mediyo.innertube.NewPipeUtils
 import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.models.WatchEndpoint
 import com.shrawan.mediyo.innertube.models.response.PlayerResponse
@@ -630,7 +631,7 @@ class MusicService : MediaLibraryService(),
                 return@Factory dataSpec
             }
 
-            songUrlCache[mediaId]?.takeIf { it.second < System.currentTimeMillis() }?.let {
+            songUrlCache[mediaId]?.takeIf { it.second > System.currentTimeMillis() }?.let {
                 scope.launch(Dispatchers.IO) { recoverSong(mediaId) }
                 return@Factory dataSpec.withUri(it.first.toUri())
             }
@@ -691,8 +692,14 @@ class MusicService : MediaLibraryService(),
             }
             scope.launch(Dispatchers.IO) { recoverSong(mediaId, playerResponse) }
 
-            songUrlCache[mediaId] = format.url!! to playerResponse.streamingData!!.expiresInSeconds * 1000L
-            dataSpec.withUri(format.url!!.toUri()).subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
+            val streamUrl =
+                NewPipeUtils.getStreamUrl(format, mediaId).getOrNull()
+                    ?: format.url
+                    ?: throw PlaybackException(getString(R.string.error_no_stream), null, ERROR_CODE_NO_STREAM)
+
+            songUrlCache[mediaId] =
+                streamUrl to (System.currentTimeMillis() + playerResponse.streamingData!!.expiresInSeconds * 1000L)
+            dataSpec.withUri(streamUrl.toUri()).subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
         }
     }
 

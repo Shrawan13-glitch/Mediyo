@@ -13,6 +13,7 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
+import com.shrawan.mediyo.innertube.NewPipeUtils
 import com.shrawan.mediyo.innertube.YouTube
 import com.shrawan.mediyo.music.constants.AudioQuality
 import com.shrawan.mediyo.music.constants.AudioQualityKey
@@ -63,7 +64,7 @@ class DownloadUtil @Inject constructor(
             return@Factory dataSpec
         }
 
-        songUrlCache[mediaId]?.takeIf { it.second < System.currentTimeMillis() }?.let {
+        songUrlCache[mediaId]?.takeIf { it.second > System.currentTimeMillis() }?.let {
             return@Factory dataSpec.withUri(it.first.toUri())
         }
 
@@ -108,8 +109,14 @@ class DownloadUtil @Inject constructor(
             )
         }
 
-        songUrlCache[mediaId] = format.url!! to playerResponse.streamingData!!.expiresInSeconds * 1000L
-        dataSpec.withUri(format.url!!.toUri())
+        val streamUrl =
+            NewPipeUtils.getStreamUrl(format, mediaId).getOrNull()
+                ?: format.url
+                ?: throw PlaybackException(playerResponse.playabilityStatus.reason, null, PlaybackException.ERROR_CODE_REMOTE_ERROR)
+
+        songUrlCache[mediaId] =
+            streamUrl to (System.currentTimeMillis() + playerResponse.streamingData!!.expiresInSeconds * 1000L)
+        dataSpec.withUri(streamUrl.toUri())
     }
     val downloadNotificationHelper = DownloadNotificationHelper(context, ExoDownloadService.CHANNEL_ID)
     val downloadManager: DownloadManager = DownloadManager(context, databaseProvider, downloadCache, dataSourceFactory, Executor(Runnable::run)).apply {
