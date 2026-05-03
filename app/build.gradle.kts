@@ -35,7 +35,9 @@ android {
             isShrinkResources = true
             isCrunchPngs = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
+            if (System.getenv("KEYSTORE_FILE") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
         debug {
             applicationIdSuffix = ".debug"
@@ -61,7 +63,7 @@ android {
 //    }
     
     signingConfigs {
-        getByName("debug") {
+        create("debug") {
             if (System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD") != null) {
                 storeFile = file(System.getenv("MUSIC_DEBUG_KEYSTORE_FILE"))
                 storePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
@@ -69,7 +71,7 @@ android {
                 keyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD")
             }
         }
-        getByName("release") {
+        create("release") {
             if (System.getenv("KEYSTORE_FILE") != null) {
                 storeFile = file(System.getenv("KEYSTORE_FILE"))
                 storePassword = System.getenv("KEYSTORE_PASSWORD")
