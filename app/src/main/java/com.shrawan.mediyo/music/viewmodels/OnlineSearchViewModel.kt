@@ -8,9 +8,19 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.innertube.YouTube
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_ALBUM
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_ARTIST
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_COMMUNITY_PLAYLIST
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_FEATURED_PLAYLIST
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_PODCAST
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_PROFILE
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_SONG
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_VIDEO
 import com.shrawan.mediyo.innertube.models.filterExplicit
 import com.shrawan.mediyo.innertube.pages.SearchSummaryPage
+import com.shrawan.mediyo.innertube.pages.SearchSummary
 import com.shrawan.mediyo.music.constants.HideExplicitKey
 import com.shrawan.mediyo.music.models.ItemsPage
 import com.shrawan.mediyo.music.utils.AppLogs
@@ -20,7 +30,9 @@ import com.shrawan.mediyo.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.net.URLDecoder
 import javax.inject.Inject
 import kotlin.collections.set
@@ -30,6 +42,16 @@ class OnlineSearchViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private data class SectionSpec(
+        val title: String,
+        val filter: YouTube.SearchFilter,
+    )
+
+    private data class SectionLoadResult(
+        val summary: SearchSummary?,
+        val error: Throwable? = null,
+    )
+
     val query = try {
         URLDecoder.decode(savedStateHandle.get<String>("query")!!, "UTF-8")
     } catch (e: IllegalArgumentException) {
@@ -42,16 +64,50 @@ class OnlineSearchViewModel @Inject constructor(
 
     private suspend fun loadSummaryPage() {
         if (summaryPage != null) return
-        YouTube.searchSummary(query)
-            .onSuccess {
-                summaryError = null
-                summaryPage = it.filterExplicit(context.dataStore.get(HideExplicitKey, false))
-            }
-            .onFailure {
-                summaryError = it
-                AppLogs.declare(context, "Search", "All tab summary failed for query=\"$query\"", it)
-                reportException(it)
-            }
+        val hideExplicit = context.dataStore.get(HideExplicitKey, false)
+        val specs = listOf(
+            SectionSpec(context.getString(R.string.filter_songs), FILTER_SONG),
+            SectionSpec(context.getString(R.string.filter_videos), FILTER_VIDEO),
+            SectionSpec(context.getString(R.string.filter_albums), FILTER_ALBUM),
+            SectionSpec(context.getString(R.string.filter_artists), FILTER_ARTIST),
+            SectionSpec(context.getString(R.string.filter_featured_playlists), FILTER_FEATURED_PLAYLIST),
+            SectionSpec(context.getString(R.string.filter_community_playlists), FILTER_COMMUNITY_PLAYLIST),
+            SectionSpec(context.getString(R.string.filter_podcasts), FILTER_PODCAST),
+            SectionSpec(context.getString(R.string.filter_profiles), FILTER_PROFILE),
+        )
+        val results = supervisorScope {
+            specs.map { spec ->
+                async {
+                    runCatching {
+                        val items = YouTube.search(query, spec.filter)
+                            .getOrThrow()
+                            .items
+                            .distinctBy { it.id }
+                            .filterExplicit(hideExplicit)
+                            .take(5)
+                        SectionLoadResult(
+                            summary = items.takeIf { it.isNotEmpty() }?.let {
+                                SearchSummary(title = spec.title, items = it)
+                            }
+                        )
+                    }.getOrElse { error ->
+                        AppLogs.declare(
+                            context,
+                            "Search",
+                            "All tab section failed for query=\"$query\" filter=${spec.filter.value}",
+                            error
+                        )
+                        reportException(error)
+                        SectionLoadResult(summary = null, error = error)
+                    }
+                }
+            }.map { it.await() }
+        }
+        val summaries = results.mapNotNull { it.summary }
+        val firstError = results.firstOrNull { it.error != null }?.error
+        val failedCompletely = summaries.isEmpty() && firstError != null
+        summaryPage = if (failedCompletely) null else SearchSummaryPage(summaries)
+        summaryError = if (failedCompletely) firstError else null
     }
 
     init {
