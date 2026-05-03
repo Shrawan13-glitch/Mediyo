@@ -4,8 +4,8 @@ import com.shrawan.mediyo.innertube.models.YouTubeClient
 import com.shrawan.mediyo.innertube.models.response.PlayerResponse
 import io.ktor.http.URLBuilder
 import io.ktor.http.parseQueryString
-import io.ktor.http.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.downloader.Downloader
 import org.schabi.newpipe.extractor.downloader.Request
@@ -28,7 +28,7 @@ private object NewPipeDownloader : Downloader() {
         val dataToSend = request.dataToSend()
 
         val requestBuilder = okhttp3.Request.Builder()
-            .method(httpMethod, dataToSend?.let { okhttp3.RequestBody.create("application/octet-stream".toMediaType(), it) })
+            .method(httpMethod, dataToSend?.toRequestBody())
             .url(url)
             .addHeader("User-Agent", YouTubeClient.USER_AGENT_WEB_PUBLIC)
 
@@ -51,7 +51,15 @@ private object NewPipeDownloader : Downloader() {
         }
 
         val latestUrl = response.request.url.toString()
-        return Response(response.code, response.message, latestUrl, response.headers.toMultimap(), response.body?.string())
+        val responseBody = response.body?.string()
+        return Response(
+            response.code,
+            response.message,
+            response.headers.toMultimap(),
+            responseBody,
+            responseBody?.toByteArray(),
+            latestUrl
+        )
     }
 }
 
