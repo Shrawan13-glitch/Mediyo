@@ -121,7 +121,7 @@ object YouTube {
                     when {
                         section.musicCardShelfRenderer != null -> {
                             val title =
-                                section.musicCardShelfRenderer.header.musicCardShelfHeaderBasicRenderer.title.runs
+                                section.musicCardShelfRenderer.header?.musicCardShelfHeaderBasicRenderer?.title?.runs
                                     ?.firstOrNull()
                                     ?.text ?: return@forEach
                             val items =

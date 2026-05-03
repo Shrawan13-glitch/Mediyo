@@ -5,6 +5,7 @@ import com.shrawan.mediyo.innertube.models.AlbumItem
 import com.shrawan.mediyo.innertube.models.Artist
 import com.shrawan.mediyo.innertube.models.ArtistItem
 import com.shrawan.mediyo.innertube.models.MusicResponsiveListItemRenderer
+import com.shrawan.mediyo.innertube.models.PlaylistItem
 import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.models.YTItem
 import com.shrawan.mediyo.innertube.models.oddElements
