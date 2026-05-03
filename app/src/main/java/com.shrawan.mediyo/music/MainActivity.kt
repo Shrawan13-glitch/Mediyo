@@ -142,6 +142,8 @@ import com.shrawan.mediyo.music.ui.utils.resetHeightOffset
 import com.shrawan.mediyo.music.utils.Updater
 import com.shrawan.mediyo.music.utils.dataStore
 import com.shrawan.mediyo.music.utils.get
+import com.shrawan.mediyo.BuildConfig
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.utils.rememberEnumPreference
 import com.shrawan.mediyo.music.utils.rememberPreference
 import com.shrawan.mediyo.music.utils.reportException
