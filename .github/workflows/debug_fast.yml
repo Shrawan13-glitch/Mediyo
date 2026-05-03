@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-android-sdk-
 
       - name: Run Lint
-        run: ./gradlew lintFullDebug --stacktrace -DskipFormatKtlint
+        run: ./gradlew lintFossDebug --stacktrace -DskipFormatKtlint
 
   build:
     needs: lint
@@ -73,18 +73,18 @@ jobs:
             ${{ runner.os }}-android-sdk-
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace -DskipFormatKtlint
+        run: ./gradlew assembleFossDebug --stacktrace -DskipFormatKtlint
         env:
           PULL_REQUEST: 'true'
 
       - name: Run JVM tests
-        run: ./gradlew testFullDebugUnitTest --stacktrace -DskipFormatKtlint
+        run: ./gradlew testFossDebugUnitTest --stacktrace -DskipFormatKtlint
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: app/build/outputs/apk/full/debug/*.apk
+          path: app/build/outputs/apk/foss/debug/*.apk
 
       - name: Upload Test Results
         if: always()
