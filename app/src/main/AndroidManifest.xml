@@ -126,7 +126,7 @@
         </provider>
 
         <service
-            android:name=".playback.MusicService"
+            android:name="com.shrawan.mediyo.music.playback.MusicService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
             tools:ignore="ExportedService">
@@ -138,7 +138,7 @@
         </service>
 
         <service
-            android:name=".playback.ExoDownloadService"
+            android:name="com.shrawan.mediyo.music.playback.ExoDownloadService"
             android:foregroundServiceType="dataSync"
             android:exported="false">
             <intent-filter>
