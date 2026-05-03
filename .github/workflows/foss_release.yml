@@ -44,7 +44,7 @@ jobs:
           cache-build-outputs: true
 
       - name: Build FOSS Release APK
-        run: ./gradlew assembleFossRelease --build-cache --stacktrace -DskipFormatKtlint
+        run: ./gradlew assembleFossRelease --no-configuration-cache --build-cache --stacktrace -DskipFormatKtlint
         env:
           PULL_REQUEST: "false"
 
