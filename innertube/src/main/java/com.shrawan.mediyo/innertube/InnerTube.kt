@@ -124,12 +124,14 @@ class InnerTube {
         client: YouTubeClient,
         videoId: String,
         playlistId: String?,
+        signatureTimestamp: Int? = null,
+        poToken: String? = null,
     ) = httpClient.post("player") {
         ytClient(client, setLogin = true)
         setBody(
             PlayerBody(
                 context = client.toContext(locale, visitorData).let {
-                    if (client == YouTubeClient.TVHTML5) {
+                    if (client.isEmbedded) {
                         it.copy(
                             thirdParty = Context.ThirdParty(
                                 embedUrl = "https://www.youtube.com/watch?v=${videoId}"
@@ -138,7 +140,15 @@ class InnerTube {
                     } else it
                 },
                 videoId = videoId,
-                playlistId = playlistId
+                playlistId = playlistId,
+                playbackContext = if (client.useSignatureTimestamp && signatureTimestamp != null) {
+                    PlayerBody.PlaybackContext(
+                        PlayerBody.PlaybackContext.ContentPlaybackContext(signatureTimestamp)
+                    )
+                } else null,
+                serviceIntegrityDimensions = if (client.useWebPoTokens && poToken != null) {
+                    PlayerBody.ServiceIntegrityDimensions(poToken)
+                } else null,
             )
         )
     }
