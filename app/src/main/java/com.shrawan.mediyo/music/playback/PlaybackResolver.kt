@@ -16,6 +16,7 @@ import timber.log.Timber
 object PlaybackResolver {
     private const val TAG = "PlaybackResolver"
     private const val UPLOADED_TRACKS_PLAYLIST_PREFIX = "MLPT"
+    private const val ERROR_CODE_NO_STREAM = 1000001
 
     private val httpClient = OkHttpClient.Builder()
         .proxy(YouTube.proxy)
