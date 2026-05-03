@@ -11,6 +11,7 @@ import com.shrawan.mediyo.innertube.models.PlaylistItem
 import com.shrawan.mediyo.innertube.models.SearchSuggestions
 import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.models.WatchEndpoint
+import com.shrawan.mediyo.innertube.models.YouTubeClient
 import com.shrawan.mediyo.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_ATV
 import com.shrawan.mediyo.innertube.models.YouTubeClient.Companion.ANDROID_MUSIC
 import com.shrawan.mediyo.innertube.models.YouTubeClient.Companion.IOS
