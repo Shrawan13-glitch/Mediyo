@@ -17,6 +17,11 @@ if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
     apply(plugin = "com.google.firebase.firebase-perf")
 }
 
+val releaseKeystoreFile = providers.env("KEYSTORE_FILE")
+val releaseKeystorePassword = providers.env("KEYSTORE_PASSWORD")
+val releaseKeyAlias = providers.env("KEY_ALIAS")
+val releaseKeyPassword = providers.env("KEY_PASSWORD")
+
 android {
     namespace = "com.shrawan.mediyo"
     compileSdk = 35
@@ -35,9 +40,8 @@ android {
             isShrinkResources = true
             isCrunchPngs = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            val releaseConfig = signingConfigs.findByName("release")
-            if (releaseConfig?.storeFile != null) {
-                signingConfig = releaseConfig
+            if (releaseKeystoreFile.isPresent && releaseKeystorePassword.isPresent) {
+                signingConfig = signingConfigs.getByName("release")
             }
         }
         debug {
@@ -54,34 +58,23 @@ android {
         }
     }
 
-//    splits {
-//        abi {
-//            isEnable = true
-//            reset()
-//            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-//            isUniversalApk = false
-//        }
-//    }
-    
     signingConfigs {
         getByName("debug") {
-            val debugStoreFile = System.getenv("MUSIC_DEBUG_KEYSTORE_FILE")
-            val debugStorePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
-            if (debugStoreFile != null && debugStorePassword != null) {
-                storeFile = file(debugStoreFile)
-                storePassword = debugStorePassword
+            val debugStoreFile = providers.env("MUSIC_DEBUG_KEYSTORE_FILE")
+            val debugStorePassword = providers.env("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
+            if (debugStoreFile.isPresent && debugStorePassword.isPresent) {
+                storeFile = file(debugStoreFile.get())
+                storePassword = debugStorePassword.get()
                 keyAlias = "debug"
-                keyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD") ?: debugStorePassword
+                keyPassword = providers.env("MUSIC_DEBUG_SIGNING_KEY_PASSWORD").orNull ?: debugStorePassword.get()
             }
         }
-        maybeCreate("release").apply {
-            val keystoreFile = System.getenv("KEYSTORE_FILE")
-            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
-            if (keystoreFile != null && keystorePassword != null) {
-                storeFile = file(keystoreFile)
-                storePassword = keystorePassword
-                keyAlias = System.getenv("KEY_ALIAS") ?: "release"
-                keyPassword = System.getenv("KEY_PASSWORD") ?: keystorePassword
+        create("release") {
+            if (releaseKeystoreFile.isPresent && releaseKeystorePassword.isPresent) {
+                storeFile = file(releaseKeystoreFile.get())
+                storePassword = releaseKeystorePassword.get()
+                keyAlias = releaseKeyAlias.orNull ?: "release"
+                keyPassword = releaseKeyPassword.orNull ?: releaseKeystorePassword.get()
             }
         }
     }
@@ -105,11 +98,8 @@ android {
         unitTests.isIncludeAndroidResources = true
         unitTests.isReturnDefaultValues = true
     }
-    // avoid DEPENDENCY_INFO_BLOCK for IzzyOnDroid
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
     lint {
