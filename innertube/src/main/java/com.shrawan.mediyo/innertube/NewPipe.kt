@@ -1,6 +1,5 @@
 package com.shrawan.mediyo.innertube
 
-import android.util.Log
 import com.shrawan.mediyo.innertube.models.YouTubeClient
 import com.shrawan.mediyo.innertube.models.response.PlayerResponse
 import io.ktor.http.URLBuilder
@@ -64,7 +63,7 @@ private class NewPipeDownloaderImpl(
                 .Builder()
                 .method(httpMethod, dataToSend?.toRequestBody())
                 .url(url)
-                .addHeader("User-Agent", YouTubeClient.USER_AGENT_WEB)
+                .addHeader("User-Agent", YouTubeClient.USER_AGENT_WEB_PUBLIC)
 
         headers.forEach { (headerName, headerValueList) ->
             if (headerValueList.size > 1) {
@@ -86,73 +85,13 @@ private class NewPipeDownloaderImpl(
         }
 
         val latestUrl = response.request.url.toString()
-        val responseBodyToReturn = normalizeResponseBody(latestUrl, response.body.string())
+        val responseBodyToReturn = normalizeResponseBody(latestUrl, response.body?.string())
         return Response(
             response.code,
             response.message,
             response.headers.toMultimap(),
             responseBodyToReturn,
-            responseBodyToReturn?.toByteArray(),
-            latestUrl,
         )
-    }
-
-    override fun executeAsync(
-        request: Request,
-        callback: AsyncCallback?,
-    ): CancellableCall {
-        val httpRequest =
-            okhttp3.Request
-                .Builder()
-                .method(request.httpMethod(), request.dataToSend()?.toRequestBody())
-                .url(request.url())
-                .addHeader("User-Agent", YouTubeClient.USER_AGENT_WEB)
-                .apply {
-                    request.headers().forEach { (name, values) ->
-                        values.forEach { addHeader(name, it) }
-                    }
-                }.build()
-        val call = client.newCall(httpRequest)
-        call.enqueue(
-            object : okhttp3.Callback {
-                override fun onResponse(
-                    call: okhttp3.Call,
-                    response: okhttp3.Response,
-                ) {
-                    if (response.code == 429) {
-                        response.close()
-                        callback?.onError(ReCaptchaException("reCaptcha Challenge requested", request.url()))
-                        return
-                    }
-                    val latestUrl = response.request.url.toString()
-                    val body = normalizeResponseBody(latestUrl, response.body.string())
-                    val parsedResponse =
-                        Response(
-                            response.code,
-                            response.message,
-                            response.headers.toMultimap(),
-                            body,
-                            body?.toByteArray(),
-                            latestUrl,
-                        )
-                    runCatching {
-                        callback?.onSuccess(parsedResponse)
-                    }.onFailure { error ->
-                        callback?.onError(
-                            if (error is Exception) error else RuntimeException(error),
-                        )
-                    }
-                }
-
-                override fun onFailure(
-                    call: okhttp3.Call,
-                    e: IOException,
-                ) {
-                    callback?.onError(e)
-                }
-            },
-        )
-        return CancellableCall(call)
     }
 }
 
@@ -260,7 +199,6 @@ object NewPipeExtractor {
         try {
             YoutubeJavaScriptPlayerManager.getUrlWithThrottlingParameterDeobfuscated(videoId, url)
         } catch (e: Exception) {
-            Log.e("NewPipeExtractor", "getThrottlingDeobfuscatedUrl failed for videoId=$videoId: ${e.message}")
             null
         }
 }
