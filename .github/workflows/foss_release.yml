@@ -34,7 +34,9 @@ jobs:
         with:
           java-version: 17
           distribution: "zulu"
-          cache: 'gradle'
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build FOSS Release APK
         run: ./gradlew assembleFossRelease --stacktrace -DskipFormatKtlint
