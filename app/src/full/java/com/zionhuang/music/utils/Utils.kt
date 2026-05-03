@@ -1,4 +1,4 @@
-package com.zionhuang.music.utils
+package com.shrawan.mediyo.music.utils
 
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase

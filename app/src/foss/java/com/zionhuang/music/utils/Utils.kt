@@ -1,6 +1,6 @@
-package com.zionhuang.music.utils
+package com.shrawan.mediyo.music.utils
 
-import com.zionhuang.music.MainActivity
+import com.shrawan.mediyo.music.MainActivity
 import java.lang.Exception
 
 fun reportException(throwable: Throwable) {

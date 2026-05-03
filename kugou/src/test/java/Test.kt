@@ -1,5 +1,5 @@
-import com.zionhuang.kugou.KuGou
-import com.zionhuang.kugou.KuGou.generateKeyword
+import com.shrawan.mediyo.kugou.KuGou
+import com.shrawan.mediyo.kugou.KuGou.generateKeyword
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Test
