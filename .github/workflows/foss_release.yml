@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Decode Keystore
+        run: echo ${{ secrets.KEYSTORE }} | base64 -d > app/release.jks
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -44,6 +47,10 @@ jobs:
         run: ./gradlew assembleFossRelease --build-cache --stacktrace -DskipFormatKtlint
         env:
           PULL_REQUEST: "false"
+          KEYSTORE_FILE: 'release.jks'
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           GRADLE_BUILD_CACHE_DIR: ~/.gradle/build-cache
 
       - name: Upload to GitHub Release
