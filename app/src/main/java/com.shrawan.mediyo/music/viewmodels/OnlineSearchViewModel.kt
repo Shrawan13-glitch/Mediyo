@@ -26,7 +26,7 @@ import kotlin.collections.set
 
 @HiltViewModel
 class OnlineSearchViewModel @Inject constructor(
-    @ApplicationContext context: Context,
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val query = try {
