@@ -444,18 +444,27 @@ object YouTube {
         }
         val safePlayerResponse = innerTube.player(TVHTML5, videoId, playlistId).body<PlayerResponse>()
         if (safePlayerResponse.playabilityStatus.status != "OK") {
+            val webPlayerResponse = innerTube.player(WEB, videoId, playlistId).body<PlayerResponse>()
+            if (webPlayerResponse.playabilityStatus.status == "OK") {
+                return@runCatching webPlayerResponse
+            }
             return@runCatching playerResponse
         }
         val audioStreams = NewPipeExtractor.newPipePlayer(videoId)
+        if (audioStreams.isEmpty()) {
+            return@runCatching safePlayerResponse
+        }
+        val adaptiveFormats = safePlayerResponse.streamingData?.adaptiveFormats.orEmpty().mapNotNull { adaptiveFormat ->
+            audioStreams.find { it.first == adaptiveFormat.itag }?.let {
+                adaptiveFormat.copy(url = it.second)
+            }
+        }
+        if (adaptiveFormats.isEmpty()) {
+            return@runCatching safePlayerResponse
+        }
         safePlayerResponse.copy(
             streamingData = safePlayerResponse.streamingData?.copy(
-                adaptiveFormats = safePlayerResponse.streamingData.adaptiveFormats.mapNotNull { adaptiveFormat ->
-                    audioStreams.find { it.first == adaptiveFormat.itag }?.let {
-                        adaptiveFormat.copy(
-                            url = it.second
-                        )
-                    }
-                }
+                adaptiveFormats = adaptiveFormats
             )
         )
     }

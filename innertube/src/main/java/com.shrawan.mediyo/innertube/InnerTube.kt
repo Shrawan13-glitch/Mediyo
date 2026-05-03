@@ -82,12 +82,11 @@ class InnerTube {
         contentType(ContentType.Application.Json)
         headers {
             append("X-Goog-Api-Format-Version", "1")
-            append("X-YouTube-Client-Name", client.clientName)
+            append("X-YouTube-Client-Name", client.clientId)
             append("X-YouTube-Client-Version", client.clientVersion)
-            append("x-origin", "https://music.youtube.com")
-            if (client.referer != null) {
-                append("Referer", client.referer)
-            }
+            append("X-Origin", "https://music.youtube.com")
+            append("Referer", client.referer ?: "https://music.youtube.com/")
+            visitorData?.let { append("X-Goog-Visitor-Id", it) }
             if (setLogin) {
                 cookie?.let { cookie ->
                     append("cookie", cookie)
