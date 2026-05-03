@@ -35,7 +35,8 @@ android {
             isShrinkResources = true
             isCrunchPngs = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            if (System.getenv("KEYSTORE_FILE") != null) {
+            val releaseStoreFile = System.getenv("KEYSTORE_FILE")
+            if (releaseStoreFile != null && System.getenv("KEYSTORE_PASSWORD") != null) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
