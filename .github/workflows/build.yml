@@ -1,25 +1,12 @@
-name: Build debug APK
+name: Build debug APK (Manual)
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - '**'
-    paths-ignore:
-      - 'README.md'
-      - 'fastlane/**'
-      - 'assets/**'
-      - '.github/**/*.md'
-      - '.github/FUNDING.yml'
-      - '.github/ISSUE_TEMPLATE/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Decode google-services.json
-        run: echo ${{ secrets.GOOGLE_SERVICES }} | base64 -d >> app/google-services.json
 
       - name: Decode Keystore
         run: echo ${{ secrets.KEYSTORE }} | base64 -d >> app/music-debug.jks
@@ -32,7 +19,7 @@ jobs:
           cache: 'gradle'
 
       - name: Build debug APK and run jvm tests
-        run: ./gradlew assembleDebug lintFullDebug testFullDebugUnitTest --stacktrace -DskipFormatKtlint
+        run: ./gradlew assembleFossDebug lintFossDebug testFossDebugUnitTest --stacktrace -DskipFormatKtlint
         env:
           MUSIC_DEBUG_KEYSTORE_FILE: 'music-debug.jks'
           MUSIC_DEBUG_SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
@@ -42,4 +29,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: app/build/outputs/apk/full/debug/*.apk
+          path: app/build/outputs/apk/foss/debug/*.apk
