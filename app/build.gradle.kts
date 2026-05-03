@@ -17,11 +17,6 @@ if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
     apply(plugin = "com.google.firebase.firebase-perf")
 }
 
-val releaseKeystoreFile = providers.env("KEYSTORE_FILE")
-val releaseKeystorePassword = providers.env("KEYSTORE_PASSWORD")
-val releaseKeyAlias = providers.env("KEY_ALIAS")
-val releaseKeyPassword = providers.env("KEY_PASSWORD")
-
 android {
     namespace = "com.shrawan.mediyo"
     compileSdk = 35
@@ -40,9 +35,6 @@ android {
             isShrinkResources = true
             isCrunchPngs = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            if (releaseKeystoreFile.isPresent && releaseKeystorePassword.isPresent) {
-                signingConfig = signingConfigs.getByName("release")
-            }
         }
         debug {
             applicationIdSuffix = ".debug"
@@ -67,14 +59,6 @@ android {
                 storePassword = debugStorePassword.get()
                 keyAlias = "debug"
                 keyPassword = providers.env("MUSIC_DEBUG_SIGNING_KEY_PASSWORD").orNull ?: debugStorePassword.get()
-            }
-        }
-        create("release") {
-            if (releaseKeystoreFile.isPresent && releaseKeystorePassword.isPresent) {
-                storeFile = file(releaseKeystoreFile.get())
-                storePassword = releaseKeystorePassword.get()
-                keyAlias = releaseKeyAlias.orNull ?: "release"
-                keyPassword = releaseKeyPassword.orNull ?: releaseKeystorePassword.get()
             }
         }
     }
