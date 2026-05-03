@@ -37,11 +37,14 @@ jobs:
 
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-build-outputs: true
 
       - name: Build FOSS Release APK
-        run: ./gradlew assembleFossRelease --stacktrace -DskipFormatKtlint
+        run: ./gradlew assembleFossRelease --build-cache --stacktrace -DskipFormatKtlint
         env:
           PULL_REQUEST: "false"
+          GRADLE_BUILD_CACHE_DIR: ~/.gradle/build-cache
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
