@@ -1,8 +1,9 @@
-name: Build PR
+name: Build PR (Manual)
 on:
   pull_request:
     branches:
       - '**'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,7 +19,7 @@ jobs:
           cache: 'gradle'
 
       - name: Build debug APK and run jvm tests
-        run: ./gradlew assembleDebug lintFullDebug testFullDebugUnitTest --stacktrace -DskipFormatKtlint
+        run: ./gradlew assembleFossDebug lintFossDebug testFossDebugUnitTest --stacktrace -DskipFormatKtlint
         env:
           PULL_REQUEST: 'true'
 
@@ -26,4 +27,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: app/build/outputs/apk/full/debug/*.apk
+          path: app/build/outputs/apk/foss/debug/*.apk
