@@ -216,13 +216,13 @@ object PlaybackResolver {
         val finalFormat = selectedFormat ?: throw PlaybackException(
             "Could not find format",
             null,
-            PlaybackException.ERROR_CODE_NO_STREAM,
+            ERROR_CODE_NO_STREAM,
         )
 
         val finalStreamUrl = streamUrl ?: throw PlaybackException(
             "Could not find stream url",
             null,
-            PlaybackException.ERROR_CODE_NO_STREAM,
+            ERROR_CODE_NO_STREAM,
         )
 
         val finalExpires = streamExpiresInSeconds ?: throw PlaybackException(
