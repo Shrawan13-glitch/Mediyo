@@ -57,7 +57,6 @@ private object NewPipeDownloader : Downloader() {
             response.message,
             response.headers.toMultimap(),
             responseBody,
-            responseBody?.toByteArray(),
             latestUrl
         )
     }
