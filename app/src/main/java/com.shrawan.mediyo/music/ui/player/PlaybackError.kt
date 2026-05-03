@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.PlaybackException
 import com.shrawan.mediyo.R
@@ -21,6 +22,19 @@ fun PlaybackError(
     error: PlaybackException,
     retry: () -> Unit,
 ) {
+    val details = buildString {
+        append(error.message?.takeIf { it.isNotBlank() } ?: stringResource(R.string.error_unknown))
+        if (error.errorCodeName.isNotBlank()) {
+            append(" [")
+            append(error.errorCodeName)
+            append("]")
+        }
+        error.cause?.message?.takeIf { it.isNotBlank() }?.let { causeMessage ->
+            append("\n")
+            append(causeMessage)
+        }
+    }
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -37,8 +51,10 @@ fun PlaybackError(
         )
 
         Text(
-            text = error.cause?.cause?.message ?: stringResource(R.string.error_unknown),
-            style = MaterialTheme.typography.bodyMedium
+            text = details,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

@@ -32,6 +32,9 @@ import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_ALBUM
 import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_ARTIST
 import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_COMMUNITY_PLAYLIST
 import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_FEATURED_PLAYLIST
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_EPISODE
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_PODCAST
+import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_PROFILE
 import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_SONG
 import com.shrawan.mediyo.innertube.YouTube.SearchFilter.Companion.FILTER_VIDEO
 import com.shrawan.mediyo.innertube.models.AlbumItem
@@ -76,6 +79,7 @@ fun OnlineSearchResult(
 
     val searchFilter by viewModel.filter.collectAsState()
     val searchSummary = viewModel.summaryPage
+    val searchError = viewModel.summaryError
     val itemsPage by remember(searchFilter) {
         derivedStateOf {
             searchFilter?.value?.let {
@@ -187,6 +191,18 @@ fun OnlineSearchResult(
                     )
                 }
             }
+
+            if (searchSummary == null && searchError != null) {
+                item {
+                    EmptyPlaceholder(
+                        icon = R.drawable.info,
+                        text = searchError.message ?: stringResource(R.string.error_unknown),
+                        modifier = Modifier
+                            .animateItem()
+                            .clickable { viewModel.reloadSummaryPage() }
+                    )
+                }
+            }
         } else {
             items(
                 items = itemsPage?.items.orEmpty(),
@@ -216,10 +232,14 @@ fun OnlineSearchResult(
         }
 
         if (searchFilter == null && searchSummary == null || searchFilter != null && itemsPage == null) {
-            item {
-                ShimmerHost {
-                    repeat(8) {
-                        ListItemPlaceHolder()
+            if (searchFilter == null && searchError != null) {
+                // Show the error state instead of staying in the loading shimmer forever.
+            } else {
+                item {
+                    ShimmerHost {
+                        repeat(8) {
+                            ListItemPlaceHolder()
+                        }
                     }
                 }
             }
@@ -234,7 +254,10 @@ fun OnlineSearchResult(
             FILTER_ALBUM to stringResource(R.string.filter_albums),
             FILTER_ARTIST to stringResource(R.string.filter_artists),
             FILTER_COMMUNITY_PLAYLIST to stringResource(R.string.filter_community_playlists),
-            FILTER_FEATURED_PLAYLIST to stringResource(R.string.filter_featured_playlists)
+            FILTER_FEATURED_PLAYLIST to stringResource(R.string.filter_featured_playlists),
+            FILTER_PODCAST to stringResource(R.string.filter_podcasts),
+            FILTER_EPISODE to stringResource(R.string.filter_episodes),
+            FILTER_PROFILE to stringResource(R.string.filter_profiles)
         ),
         currentValue = searchFilter,
         onValueUpdate = {

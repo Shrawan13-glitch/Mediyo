@@ -589,6 +589,7 @@ class MusicService : MediaLibraryService(),
     }
 
     override fun onPlayerError(error: PlaybackException) {
+        reportException(error)
         if (dataStore.get(AutoSkipNextOnErrorKey, false) &&
             isInternetAvailable(this) &&
             player.hasNextMediaItem()

@@ -69,6 +69,11 @@ fun SettingsScreen(
             onClick = { navController.navigate("settings/privacy") }
         )
         PreferenceEntry(
+            title = { Text(stringResource(R.string.logs)) },
+            icon = { Icon(painterResource(R.drawable.history), null) },
+            onClick = { navController.navigate("settings/logs") }
+        )
+        PreferenceEntry(
             title = { Text(stringResource(R.string.discord_integration)) },
             icon = { Icon(painterResource(R.drawable.discord), null) },
             onClick = { navController.navigate("settings/discord") }

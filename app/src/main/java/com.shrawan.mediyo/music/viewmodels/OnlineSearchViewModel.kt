@@ -36,25 +36,32 @@ class OnlineSearchViewModel @Inject constructor(
     }
     val filter = MutableStateFlow<YouTube.SearchFilter?>(null)
     var summaryPage by mutableStateOf<SearchSummaryPage?>(null)
+    var summaryError by mutableStateOf<Throwable?>(null)
     val viewStateMap = mutableStateMapOf<String, ItemsPage?>()
+
+    private suspend fun loadSummaryPage() {
+        if (summaryPage != null) return
+        YouTube.searchSummary(query)
+            .onSuccess {
+                summaryError = null
+                summaryPage = it.filterExplicit(context.dataStore.get(HideExplicitKey, false))
+            }
+            .onFailure {
+                summaryError = it
+                reportException(it)
+            }
+    }
 
     init {
         viewModelScope.launch {
             filter.collect { filter ->
                 if (filter == null) {
-                    if (summaryPage == null) {
-                        YouTube.searchSummary(query)
-                            .onSuccess {
-                                summaryPage = it.filterExplicit(context.dataStore.get(HideExplicitKey, false))
-                            }
-                            .onFailure {
-                                reportException(it)
-                            }
-                    }
+                    loadSummaryPage()
                 } else {
                     if (viewStateMap[filter.value] == null) {
                         YouTube.search(query, filter)
                             .onSuccess { result ->
+                                summaryError = null
                                 viewStateMap[filter.value] = ItemsPage(
                                     result.items
                                         .distinctBy { it.id }
@@ -63,11 +70,20 @@ class OnlineSearchViewModel @Inject constructor(
                                 )
                             }
                             .onFailure {
+                                summaryError = it
                                 reportException(it)
                             }
                     }
                 }
             }
+        }
+    }
+
+    fun reloadSummaryPage() {
+        summaryPage = null
+        summaryError = null
+        viewModelScope.launch {
+            loadSummaryPage()
         }
     }
 

@@ -27,6 +27,7 @@ import com.shrawan.mediyo.music.extensions.toEnum
 import com.shrawan.mediyo.music.extensions.toInetSocketAddress
 import com.shrawan.mediyo.music.utils.dataStore
 import com.shrawan.mediyo.music.utils.get
+import com.shrawan.mediyo.music.utils.FileTree
 import com.shrawan.mediyo.music.utils.reportException
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -43,7 +44,7 @@ class App : Application(), ImageLoaderFactory {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(FileTree(this))
 
         val locale = Locale.getDefault()
         val languageTag = locale.toLanguageTag().replace("-Hant", "") // replace zh-Hant-* to zh-*

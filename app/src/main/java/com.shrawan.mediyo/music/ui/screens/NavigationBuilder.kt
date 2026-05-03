@@ -28,6 +28,7 @@ import com.shrawan.mediyo.music.ui.screens.settings.BackupAndRestore
 import com.shrawan.mediyo.music.ui.screens.settings.ContentSettings
 import com.shrawan.mediyo.music.ui.screens.settings.DiscordLoginScreen
 import com.shrawan.mediyo.music.ui.screens.settings.DiscordSettings
+import com.shrawan.mediyo.music.ui.screens.settings.LogScreen
 import com.shrawan.mediyo.music.ui.screens.settings.PlayerSettings
 import com.shrawan.mediyo.music.ui.screens.settings.PrivacySettings
 import com.shrawan.mediyo.music.ui.screens.settings.SettingsScreen
@@ -204,6 +205,9 @@ fun NavGraphBuilder.navigationBuilder(
     }
     composable("settings/privacy") {
         PrivacySettings(navController, scrollBehavior)
+    }
+    composable("settings/logs") {
+        LogScreen(navController, scrollBehavior)
     }
     composable("settings/backup_restore") {
         BackupAndRestore(navController, scrollBehavior)
