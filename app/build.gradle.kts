@@ -52,13 +52,14 @@ android {
 
     signingConfigs {
         getByName("debug") {
-            val debugStoreFile = providers.env("MUSIC_DEBUG_KEYSTORE_FILE")
-            val debugStorePassword = providers.env("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
-            if (debugStoreFile.isPresent && debugStorePassword.isPresent) {
-                storeFile = file(debugStoreFile.get())
-                storePassword = debugStorePassword.get()
+            val debugStoreFile = System.getenv("MUSIC_DEBUG_KEYSTORE_FILE")
+            val debugStorePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
+            val debugKeyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD")
+            if (debugStoreFile != null && debugStorePassword != null) {
+                storeFile = file(debugStoreFile)
+                storePassword = debugStorePassword
                 keyAlias = "debug"
-                keyPassword = providers.env("MUSIC_DEBUG_SIGNING_KEY_PASSWORD").orNull ?: debugStorePassword.get()
+                keyPassword = debugKeyPassword ?: debugStorePassword
             }
         }
     }
