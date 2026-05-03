@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.DiscordTokenKey
 import com.shrawan.mediyo.music.ui.component.IconButton
 import com.shrawan.mediyo.music.ui.utils.backToMain

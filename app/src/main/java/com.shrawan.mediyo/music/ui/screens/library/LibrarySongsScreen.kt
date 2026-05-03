@@ -45,7 +45,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_HEADER
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_SONG
 import com.shrawan.mediyo.music.constants.SongFilter

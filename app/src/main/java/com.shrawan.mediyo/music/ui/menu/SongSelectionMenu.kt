@@ -26,7 +26,7 @@ import androidx.media3.exoplayer.offline.DownloadService
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalDownloadUtil
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.db.entities.Song
 import com.shrawan.mediyo.music.extensions.toMediaItem
 import com.shrawan.mediyo.music.playback.ExoDownloadService

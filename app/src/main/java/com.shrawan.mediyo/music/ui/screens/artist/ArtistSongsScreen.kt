@@ -46,7 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.ArtistSongSortDescendingKey
 import com.shrawan.mediyo.music.constants.ArtistSongSortType
 import com.shrawan.mediyo.music.constants.ArtistSongSortTypeKey

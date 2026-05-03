@@ -39,7 +39,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import coil.compose.AsyncImage
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.MiniPlayerHeight
 import com.shrawan.mediyo.music.constants.ThumbnailCornerRadius
 import com.shrawan.mediyo.music.extensions.togglePlayPause

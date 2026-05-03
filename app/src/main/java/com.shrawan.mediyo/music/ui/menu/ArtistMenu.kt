@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.ArtistSongSortType
 import com.shrawan.mediyo.music.db.entities.Artist
 import com.shrawan.mediyo.music.extensions.toMediaItem

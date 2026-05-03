@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.shrawan.mediyo.music.LocalDatabase
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.ListThumbnailSize
 import com.shrawan.mediyo.music.db.entities.Playlist
 import com.shrawan.mediyo.music.db.entities.PlaylistEntity

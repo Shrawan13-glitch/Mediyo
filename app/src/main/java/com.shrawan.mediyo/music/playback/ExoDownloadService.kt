@@ -13,7 +13,7 @@ import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

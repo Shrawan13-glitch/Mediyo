@@ -40,7 +40,7 @@ import com.shrawan.mediyo.innertube.models.PlaylistItem
 import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.SuggestionItemHeight
 import com.shrawan.mediyo.music.extensions.togglePlayPause
 import com.shrawan.mediyo.music.models.toMediaMetadata

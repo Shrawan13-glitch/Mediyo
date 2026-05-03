@@ -41,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.DarkModeKey
 import com.shrawan.mediyo.music.constants.DefaultOpenTabKey
 import com.shrawan.mediyo.music.constants.DynamicThemeKey

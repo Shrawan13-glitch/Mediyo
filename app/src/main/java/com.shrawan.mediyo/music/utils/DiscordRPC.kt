@@ -3,7 +3,7 @@ package com.shrawan.mediyo.music.utils
 import android.content.Context
 import com.my.kizzy.rpc.KizzyRPC
 import com.my.kizzy.rpc.RpcImage
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.db.entities.Song
 
 class DiscordRPC(

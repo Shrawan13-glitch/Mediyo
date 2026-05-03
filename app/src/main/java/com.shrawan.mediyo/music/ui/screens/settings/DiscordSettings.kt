@@ -54,7 +54,7 @@ import coil.compose.AsyncImage
 import com.my.kizzy.rpc.KizzyRPC
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.DiscordInfoDismissedKey
 import com.shrawan.mediyo.music.constants.DiscordNameKey
 import com.shrawan.mediyo.music.constants.DiscordTokenKey

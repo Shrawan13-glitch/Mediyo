@@ -76,7 +76,7 @@ import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalDownloadUtil
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.AlbumThumbnailSize
 import com.shrawan.mediyo.music.constants.ThumbnailCornerRadius
 import com.shrawan.mediyo.music.db.entities.Album

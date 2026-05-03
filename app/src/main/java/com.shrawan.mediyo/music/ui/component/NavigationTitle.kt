@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 
 @Composable
 fun NavigationTitle(

@@ -54,7 +54,7 @@ import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalDownloadUtil
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.ListItemHeight
 import com.shrawan.mediyo.music.models.MediaMetadata
 import com.shrawan.mediyo.music.playback.ExoDownloadService

@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.ui.component.IconButton
 import com.shrawan.mediyo.music.ui.component.PreferenceEntry
 import com.shrawan.mediyo.music.ui.utils.backToMain

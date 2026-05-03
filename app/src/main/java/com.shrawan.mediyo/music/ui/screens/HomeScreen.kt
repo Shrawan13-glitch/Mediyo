@@ -61,7 +61,7 @@ import com.shrawan.mediyo.innertube.utils.parseCookieString
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.GridThumbnailHeight
 import com.shrawan.mediyo.music.constants.InnerTubeCookieKey
 import com.shrawan.mediyo.music.constants.ListItemHeight

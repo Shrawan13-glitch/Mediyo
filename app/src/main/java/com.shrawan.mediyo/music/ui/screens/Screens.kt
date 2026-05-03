@@ -3,7 +3,7 @@ package com.shrawan.mediyo.music.ui.screens
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 
 @Immutable
 sealed class Screens(

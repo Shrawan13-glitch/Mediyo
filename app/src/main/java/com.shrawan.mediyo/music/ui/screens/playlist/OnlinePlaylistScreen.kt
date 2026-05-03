@@ -85,7 +85,7 @@ import com.shrawan.mediyo.innertube.models.WatchEndpoint
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.AlbumThumbnailSize
 import com.shrawan.mediyo.music.constants.HideExplicitKey
 import com.shrawan.mediyo.music.constants.ThumbnailCornerRadius

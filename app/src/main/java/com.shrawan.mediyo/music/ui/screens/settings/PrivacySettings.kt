@@ -28,7 +28,7 @@ import androidx.navigation.NavController
 import com.shrawan.mediyo.innertube.YouTube
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.DisableScreenshotKey
 import com.shrawan.mediyo.music.constants.PauseListenHistoryKey
 import com.shrawan.mediyo.music.constants.PauseSearchHistoryKey

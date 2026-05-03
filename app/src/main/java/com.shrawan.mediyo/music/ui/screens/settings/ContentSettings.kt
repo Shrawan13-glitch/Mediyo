@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.shrawan.mediyo.innertube.utils.parseCookieString
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.AccountChannelHandleKey
 import com.shrawan.mediyo.music.constants.AccountEmailKey
 import com.shrawan.mediyo.music.constants.AccountNameKey

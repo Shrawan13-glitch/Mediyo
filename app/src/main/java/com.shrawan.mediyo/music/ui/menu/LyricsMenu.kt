@@ -46,7 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shrawan.mediyo.music.LocalDatabase
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.db.entities.LyricsEntity
 import com.shrawan.mediyo.music.models.MediaMetadata
 import com.shrawan.mediyo.music.ui.component.DefaultDialog

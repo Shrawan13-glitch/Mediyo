@@ -18,7 +18,7 @@ import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.utils.completed
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.extensions.toMediaItem
 import com.shrawan.mediyo.music.models.toMediaMetadata
 import com.shrawan.mediyo.music.playback.queues.YouTubeQueue

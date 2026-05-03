@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.PlaybackException
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 
 @Composable
 fun PlaybackError(

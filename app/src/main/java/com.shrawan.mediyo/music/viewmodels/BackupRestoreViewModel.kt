@@ -6,7 +6,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.shrawan.mediyo.music.MainActivity
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.db.InternalDatabase
 import com.shrawan.mediyo.music.db.MusicDatabase
 import com.shrawan.mediyo.music.extensions.div

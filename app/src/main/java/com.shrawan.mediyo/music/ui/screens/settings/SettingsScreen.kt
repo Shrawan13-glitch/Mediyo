@@ -20,9 +20,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import com.shrawan.mediyo.music.BuildConfig
+import com.shrawan.mediyo.BuildConfig
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.ui.component.IconButton
 import com.shrawan.mediyo.music.ui.component.PreferenceEntry
 import com.shrawan.mediyo.music.ui.utils.backToMain

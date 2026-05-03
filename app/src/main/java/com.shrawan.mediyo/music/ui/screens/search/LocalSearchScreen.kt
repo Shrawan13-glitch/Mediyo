@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_LIST
 import com.shrawan.mediyo.music.constants.ListItemHeight
 import com.shrawan.mediyo.music.db.entities.Album

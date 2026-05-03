@@ -43,7 +43,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_HEADER
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_PLAYLIST
 import com.shrawan.mediyo.music.constants.GridCellSize

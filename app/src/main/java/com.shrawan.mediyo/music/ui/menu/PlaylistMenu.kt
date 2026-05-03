@@ -37,7 +37,7 @@ import com.shrawan.mediyo.innertube.utils.completed
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalDownloadUtil
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.db.entities.Playlist
 import com.shrawan.mediyo.music.db.entities.PlaylistSong
 import com.shrawan.mediyo.music.db.entities.PlaylistSongMap

@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
-import com.shrawan.mediyo.music.BuildConfig
+import com.shrawan.mediyo.BuildConfig
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.MaxImageCacheSizeKey
 import com.shrawan.mediyo.music.constants.MaxSongCacheSizeKey
 import com.shrawan.mediyo.music.extensions.tryOrNull

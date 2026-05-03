@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.ui.component.IconButton
 import com.shrawan.mediyo.music.ui.component.NavigationTitle
 import com.shrawan.mediyo.music.ui.component.shimmer.ListItemPlaceHolder

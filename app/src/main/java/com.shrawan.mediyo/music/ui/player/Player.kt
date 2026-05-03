@@ -63,7 +63,7 @@ import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_READY
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.DarkModeKey
 import com.shrawan.mediyo.music.constants.PlayerHorizontalPadding
 import com.shrawan.mediyo.music.constants.PlayerTextAlignmentKey

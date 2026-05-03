@@ -41,7 +41,7 @@ import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.models.YTItem
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.AppBarHeight
 import com.shrawan.mediyo.music.constants.SearchFilterHeight
 import com.shrawan.mediyo.music.extensions.togglePlayPause

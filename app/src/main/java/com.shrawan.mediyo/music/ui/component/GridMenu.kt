@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.offline.Download
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 
 val GridMenuItemHeight = 108.dp
 

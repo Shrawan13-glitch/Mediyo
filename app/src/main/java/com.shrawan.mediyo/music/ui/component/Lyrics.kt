@@ -46,9 +46,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shrawan.mediyo.music.BuildConfig
+import com.shrawan.mediyo.BuildConfig
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.PlayerTextAlignmentKey
 import com.shrawan.mediyo.music.constants.TranslateLyricsKey
 import com.shrawan.mediyo.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND

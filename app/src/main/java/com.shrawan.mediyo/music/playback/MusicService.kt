@@ -55,7 +55,7 @@ import com.shrawan.mediyo.innertube.models.SongItem
 import com.shrawan.mediyo.innertube.models.WatchEndpoint
 import com.shrawan.mediyo.innertube.models.response.PlayerResponse
 import com.shrawan.mediyo.music.MainActivity
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.AudioNormalizationKey
 import com.shrawan.mediyo.music.constants.AudioQuality
 import com.shrawan.mediyo.music.constants.AudioQualityKey

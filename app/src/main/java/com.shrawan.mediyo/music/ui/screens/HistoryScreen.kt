@@ -58,7 +58,7 @@ import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
-import com.shrawan.mediyo.music.R
+import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.db.entities.EventWithSong
 import com.shrawan.mediyo.music.extensions.toMediaItem
 import com.shrawan.mediyo.music.extensions.togglePlayPause
