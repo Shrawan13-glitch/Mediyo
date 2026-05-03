@@ -11,6 +11,7 @@ room = "2.6.1"
 hilt = "2.51.1"
 ktor = "2.3.12"
 ksp = "2.0.10-1.0.24"
+newpipeextractor = "v0.26.0"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -88,6 +89,8 @@ firebase-perf-plugin = { module = "com.google.firebase:perf-plugin", version = "
 
 mlkit-language-id = { group = "com.google.mlkit", name = "language-id", version = "17.0.6" }
 mlkit-translate = { group = "com.google.mlkit", name = "translate", version = "17.0.3" }
+
+newpipeextractor = { module = "com.github.TeamNewPipe:NewPipeExtractor", version.ref = "newpipeextractor" }
 
 [plugins]
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

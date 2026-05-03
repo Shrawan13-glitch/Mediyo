@@ -42,6 +42,7 @@ data class PlayerResponse(
         data class Format(
             val itag: Int,
             val url: String?,
+            val signatureCipher: String?,
             val mimeType: String,
             val bitrate: Int,
             val width: Int?,

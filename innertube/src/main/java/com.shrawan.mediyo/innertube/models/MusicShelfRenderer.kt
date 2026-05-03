@@ -16,5 +16,8 @@ data class MusicShelfRenderer(
     )
 }
 
+fun List<MusicShelfRenderer.Content>.getItems(): List<MusicResponsiveListItemRenderer> =
+    mapNotNull { it.musicResponsiveListItemRenderer }
+
 fun List<Continuation>.getContinuation() =
     firstOrNull()?.nextContinuationData?.continuation

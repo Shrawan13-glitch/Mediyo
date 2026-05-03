@@ -19,6 +19,7 @@ import com.shrawan.mediyo.innertube.models.YouTubeClient.Companion.WEB
 import com.shrawan.mediyo.innertube.models.YouTubeClient.Companion.WEB_REMIX
 import com.shrawan.mediyo.innertube.models.YouTubeLocale
 import com.shrawan.mediyo.innertube.models.getContinuation
+import com.shrawan.mediyo.innertube.models.getItems
 import com.shrawan.mediyo.innertube.models.oddElements
 import com.shrawan.mediyo.innertube.models.response.AccountMenuResponse
 import com.shrawan.mediyo.innertube.models.response.BrowseResponse
@@ -136,15 +137,15 @@ object YouTube {
 
     suspend fun search(query: String, filter: SearchFilter): Result<SearchResult> = runCatching {
         val response = innerTube.search(WEB_REMIX, query, filter.value).body<SearchResponse>()
+        val shelves = response.contents?.tabbedSearchResultsRenderer?.tabs?.firstOrNull()
+            ?.tabRenderer?.content?.sectionListRenderer?.contents
+            ?.mapNotNull { it.musicShelfRenderer }
+            .orEmpty()
         SearchResult(
-            items = response.contents?.tabbedSearchResultsRenderer?.tabs?.firstOrNull()
-                ?.tabRenderer?.content?.sectionListRenderer?.contents?.lastOrNull()
-                ?.musicShelfRenderer?.contents?.mapNotNull {
-                    SearchPage.toYTItem(it.musicResponsiveListItemRenderer)
-                }.orEmpty(),
-            continuation = response.contents?.tabbedSearchResultsRenderer?.tabs?.firstOrNull()
-                ?.tabRenderer?.content?.sectionListRenderer?.contents?.lastOrNull()
-                ?.musicShelfRenderer?.continuations?.getContinuation()
+            items = shelves.flatMap { shelf ->
+                shelf.contents?.getItems()?.mapNotNull { SearchPage.toYTItem(it) } ?: emptyList()
+            }.distinctBy { it.id },
+            continuation = shelves.firstOrNull { it.continuations != null }?.continuations?.getContinuation()
         )
     }
 
@@ -445,13 +446,13 @@ object YouTube {
         if (safePlayerResponse.playabilityStatus.status != "OK") {
             return@runCatching playerResponse
         }
-        val audioStreams = innerTube.pipedStreams(videoId).body<PipedResponse>().audioStreams
+        val audioStreams = NewPipeExtractor.newPipePlayer(videoId)
         safePlayerResponse.copy(
             streamingData = safePlayerResponse.streamingData?.copy(
                 adaptiveFormats = safePlayerResponse.streamingData.adaptiveFormats.mapNotNull { adaptiveFormat ->
-                    audioStreams.find { it.bitrate == adaptiveFormat.bitrate }?.let {
+                    audioStreams.find { it.first == adaptiveFormat.itag }?.let {
                         adaptiveFormat.copy(
-                            url = it.url
+                            url = it.second
                         )
                     }
                 }
