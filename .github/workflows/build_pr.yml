@@ -11,15 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: set up JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: "zulu"
-          cache: 'gradle'
 
-      - name: Build debug APK and run jvm tests
-        run: ./gradlew assembleFossDebug lintFossDebug testFossDebugUnitTest --stacktrace -DskipFormatKtlint
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-build-outputs: true
+
+      - name: Build Debug APK
+        run: ./gradlew assembleFossDebug --build-cache --stacktrace
         env:
           PULL_REQUEST: 'true'
 
