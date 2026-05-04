@@ -51,19 +51,6 @@ android {
         }
     }
 
-    signingConfigs {
-        getByName("debug") {
-            val debugStoreFile = System.getenv("MUSIC_DEBUG_KEYSTORE_FILE")
-            val debugStorePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
-            val debugKeyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD")
-            if (debugStoreFile != null && debugStorePassword != null) {
-                storeFile = file(debugStoreFile)
-                storePassword = debugStorePassword
-                keyAlias = "debug"
-                keyPassword = debugKeyPassword ?: debugStorePassword
-            }
-        }
-    }
     buildFeatures {
         buildConfig = true
         compose = true
