@@ -40,8 +40,6 @@ jobs:
 
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-build-outputs: true
 
       - name: Build FOSS Release APK
         run: ./gradlew assembleFossRelease --no-configuration-cache --build-cache --stacktrace -DskipFormatKtlint
