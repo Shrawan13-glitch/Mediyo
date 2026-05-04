@@ -1,0 +1,23 @@
+package com.shrawan.mediyo.innertube.models
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class MusicShelfRenderer(
+    val title: Runs?,
+    val contents: List<Content>?,
+    val bottomEndpoint: NavigationEndpoint?,
+    val moreContentButton: Button?,
+    val continuations: List<Continuation>?,
+) {
+    @Serializable
+    data class Content(
+        val musicResponsiveListItemRenderer: MusicResponsiveListItemRenderer,
+    )
+}
+
+fun List<MusicShelfRenderer.Content>.getItems(): List<MusicResponsiveListItemRenderer> =
+    mapNotNull { it.musicResponsiveListItemRenderer }
+
+fun List<Continuation>.getContinuation() =
+    firstOrNull()?.nextContinuationData?.continuation
