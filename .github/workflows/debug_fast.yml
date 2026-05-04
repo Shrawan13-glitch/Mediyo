@@ -31,7 +31,7 @@ jobs:
         run: ./gradlew assembleFossDebug --build-cache --stacktrace
         env:
           PULL_REQUEST: 'true'
-          MUSIC_DEBUG_KEYSTORE_FILE: 'app/debug.jks'
+          MUSIC_DEBUG_KEYSTORE_FILE: 'debug.jks'
           MUSIC_DEBUG_SIGNING_STORE_PASSWORD: ${{ secrets.DEBUG_STORE_PASSWORD }}
           MUSIC_DEBUG_SIGNING_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD }}
 
