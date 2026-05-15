@@ -165,10 +165,8 @@ fun OnlineSearchResult(
 
     LazyColumn(
         state = lazyListState,
-        contentPadding = WindowInsets.systemBars
-            .only(WindowInsetsSides.Top)
-            .add(WindowInsets(top = SearchFilterHeight))
-            .add(LocalPlayerAwareWindowInsets.current)
+        contentPadding = LocalPlayerAwareWindowInsets.current
+            .add(WindowInsets(top = AppBarHeight + SearchFilterHeight))
             .asPaddingValues()
     ) {
         if (searchFilter == null) {
