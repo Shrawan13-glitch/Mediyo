@@ -59,7 +59,7 @@ jobs:
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/foss/release/*.apk
+          files: app/build/outputs/apk/foss/release/*-signed.apk
           tag_name: ${{ github.event.inputs.tag_name }}
           name: ${{ github.event.inputs.release_name }}
           body: ${{ github.event.inputs.body }}
