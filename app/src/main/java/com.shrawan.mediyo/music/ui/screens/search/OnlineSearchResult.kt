@@ -1,6 +1,7 @@
 package com.shrawan.mediyo.music.ui.screens.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -166,8 +168,13 @@ fun OnlineSearchResult(
     LazyColumn(
         state = lazyListState,
         contentPadding = LocalPlayerAwareWindowInsets.current
-            .add(WindowInsets(top = AppBarHeight + SearchFilterHeight))
-            .asPaddingValues()
+            .only(WindowInsetsSides.Bottom)
+            .asPaddingValues(),
+        modifier = Modifier.windowInsetsPadding(
+            LocalPlayerAwareWindowInsets.current
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+                .add(WindowInsets(top = SearchFilterHeight))
+        )
     ) {
         if (searchFilter == null) {
             searchSummary?.summaries?.forEach { summary ->
@@ -286,6 +293,7 @@ fun OnlineSearchResult(
         },
         modifier = Modifier
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+            .background(MaterialTheme.colorScheme.surface)
             .padding(top = AppBarHeight)
     )
 }
