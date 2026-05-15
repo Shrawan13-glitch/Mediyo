@@ -165,14 +165,32 @@ fun OnlineSearchResult(
 
     LazyColumn(
         state = lazyListState,
-        contentPadding = LocalPlayerAwareWindowInsets.current
+        contentPadding = WindowInsets.systemBars
+            .only(WindowInsetsSides.Top)
             .add(WindowInsets(top = SearchFilterHeight))
+            .add(LocalPlayerAwareWindowInsets.current)
             .asPaddingValues()
     ) {
         if (searchFilter == null) {
             searchSummary?.summaries?.forEach { summary ->
                 item {
-                    NavigationTitle(summary.title)
+                    NavigationTitle(
+                        title = summary.title,
+                        onClick = {
+                            val filter = when {
+                                summary.title.contains("song", ignoreCase = true) -> FILTER_SONG
+                                summary.title.contains("video", ignoreCase = true) -> FILTER_VIDEO
+                                summary.title.contains("album", ignoreCase = true) -> FILTER_ALBUM
+                                summary.title.contains("artist", ignoreCase = true) -> FILTER_ARTIST
+                                summary.title.contains("playlist", ignoreCase = true) -> FILTER_COMMUNITY_PLAYLIST
+                                else -> null
+                            }
+                            viewModel.filter.value = filter
+                            coroutineScope.launch {
+                                lazyListState.animateScrollToItem(0)
+                            }
+                        }
+                    )
                 }
 
                 items(
