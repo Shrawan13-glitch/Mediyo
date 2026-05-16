@@ -13,7 +13,7 @@ object Updater {
     suspend fun getLatestVersionName(): Result<String> = runCatching {
         val response = client.get("https://api.github.com/repos/Shrawan13-glitch/Mediyo/releases/latest").bodyAsText()
         val json = JSONObject(response)
-        val versionName = json.getString("name")
+        val versionName = json.getString("name").trimStart('v', 'V')
         lastCheckTime = System.currentTimeMillis()
         versionName
     }
