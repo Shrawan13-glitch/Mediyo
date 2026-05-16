@@ -93,6 +93,7 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     placeholder: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     shape: Shape = SearchBarDefaults.inputFieldShape,
@@ -121,11 +122,14 @@ fun SearchBar(
         label = ""
     )
 
+    val isTitleMode = !active && title != null
+
     val defaultInputFieldShape = SearchBarDefaults.inputFieldShape
     val defaultFullScreenShape = SearchBarDefaults.fullScreenShape
     val animatedShape by remember {
         derivedStateOf {
             when {
+                isTitleMode -> RoundedCornerShape(0.dp)
                 shape == defaultInputFieldShape -> {
                     // The shape can only be animated if it's the default spec value
                     val animatedRadius = SearchBarCornerRadius * (1 - animationProgress)
@@ -174,15 +178,15 @@ fun SearchBar(
 
             height = lerp(startHeight, endHeight, animationProgress).toDp()
             width = lerp(startWidth, endWidth, animationProgress).toDp()
-            startPadding = lerp((SearchBarHorizontalPadding + startInset).roundToPx().toFloat(), 0f, animationProgress).toDp()
-            endPadding = lerp((SearchBarHorizontalPadding + endInset).roundToPx().toFloat(), 0f, animationProgress).toDp()
+            startPadding = if (isTitleMode) 0.dp else lerp((SearchBarHorizontalPadding + startInset).roundToPx().toFloat(), 0f, animationProgress).toDp()
+            endPadding = if (isTitleMode) 0.dp else lerp((SearchBarHorizontalPadding + endInset).roundToPx().toFloat(), 0f, animationProgress).toDp()
         }
 
         Surface(
             shape = animatedShape,
             color = colors.containerColor,
             contentColor = contentColorFor(colors.containerColor),
-            tonalElevation = tonalElevation,
+            tonalElevation = if (isTitleMode) 0.dp else tonalElevation,
             modifier = Modifier
                 .padding(
                     top = animatedSurfaceTopPadding,
@@ -201,6 +205,7 @@ fun SearchBar(
                     modifier = Modifier.padding(animatedInputFieldPadding),
                     enabled = enabled,
                     placeholder = placeholder,
+                    title = title,
                     leadingIcon = leadingIcon,
                     trailingIcon = trailingIcon,
                     colors = colors.inputFieldColors,
@@ -234,6 +239,7 @@ private fun SearchBarInputField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     placeholder: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     colors: TextFieldColors = SearchBarDefaults.inputFieldColors(),
@@ -254,18 +260,28 @@ private fun SearchBarInputField(
             .fillMaxWidth()
             .height(InputFieldHeight)
     ) {
-        if (leadingIcon != null) {
-            Spacer(Modifier.width(SearchBarIconOffsetX))
-            leadingIcon()
-        }
+        if (!active && title != null) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                title()
+            }
+        } else {
+            if (leadingIcon != null) {
+                Spacer(Modifier.width(SearchBarIconOffsetX))
+                leadingIcon()
+            }
 
-        BasicTextField(
-            value = query,
-            onValueChange = onQueryChange,
-            modifier = Modifier
-                .weight(1f)
-                .focusRequester(focusRequester)
-                .pointerInput(Unit) {
+            BasicTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(focusRequester)
+                    .pointerInput(Unit) {
                     awaitEachGesture {
                         // Must be PointerEventPass.Initial to observe events before the text field
                         // consumes them in the Main pass
@@ -311,7 +327,8 @@ private fun SearchBarInputField(
                     container = {},
                 )
             }
-        )
+            )
+        }
 
         if (trailingIcon != null) {
             trailingIcon()

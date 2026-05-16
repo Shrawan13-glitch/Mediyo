@@ -566,39 +566,38 @@ class MainActivity : ComponentActivity() {
                                         )
                                     )
                                 },
+                                title = if (!active && navBackStackEntry?.destination?.route in topLevelScreens) {
+                                    { Text(stringResource(R.string.app_name)) }
+                                } else null,
                                 leadingIcon = {
-                                    IconButton(
-                                        onClick = {
-                                            when {
-                                                active -> onActiveChange(false)
-                                                !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } -> {
-                                                    navController.navigateUp()
-                                                }
+                                    if (active || !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route }) {
+                                        IconButton(
+                                            onClick = {
+                                                when {
+                                                    active -> onActiveChange(false)
+                                                    !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } -> {
+                                                        navController.navigateUp()
+                                                    }
 
-                                                else -> onActiveChange(true)
-                                            }
-                                        },
-                                        onLongClick = {
-                                            when {
-                                                active -> {}
-                                                !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } -> {
-                                                    navController.backToMain()
+                                                    else -> onActiveChange(true)
                                                 }
+                                            },
+                                            onLongClick = {
+                                                when {
+                                                    active -> {}
+                                                    !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } -> {
+                                                        navController.backToMain()
+                                                    }
 
-                                                else -> {}
+                                                    else -> {}
+                                                }
                                             }
+                                        ) {
+                                            Icon(
+                                                painterResource(R.drawable.arrow_back),
+                                                contentDescription = null
+                                            )
                                         }
-                                    ) {
-                                        Icon(
-                                            painterResource(
-                                                if (active || !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route }) {
-                                                    R.drawable.arrow_back
-                                                } else {
-                                                    R.drawable.search
-                                                }
-                                            ),
-                                            contentDescription = null
-                                        )
                                     }
                                 },
                                 trailingIcon = {
@@ -629,6 +628,14 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     } else if (navBackStackEntry?.destination?.route in topLevelScreens) {
+                                        IconButton(
+                                            onClick = { onActiveChange(true) }
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.search),
+                                                contentDescription = null
+                                            )
+                                        }
                                         Box(
                                             contentAlignment = Alignment.Center,
                                             modifier = Modifier
