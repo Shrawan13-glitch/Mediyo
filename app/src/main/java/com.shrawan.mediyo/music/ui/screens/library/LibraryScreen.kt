@@ -186,6 +186,8 @@ private fun LibraryOverview(
     val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
+    val queueAllSongs = stringResource(R.string.queue_all_songs)
+
     LazyColumn(
         state = lazyListState,
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
@@ -261,7 +263,6 @@ private fun LibraryOverview(
         }
 
         val previewSongs = songs?.take(5) ?: emptyList()
-        val queueAllSongs = stringResource(R.string.queue_all_songs)
         if (previewSongs.isEmpty()) {
             item(key = "songs_empty") {
                 EmptyPlaceholder(
