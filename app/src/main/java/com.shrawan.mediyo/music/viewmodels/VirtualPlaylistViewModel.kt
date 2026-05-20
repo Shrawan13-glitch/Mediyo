@@ -1,6 +1,5 @@
 package com.shrawan.mediyo.music.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,13 +7,9 @@ import androidx.media3.exoplayer.offline.Download
 import com.shrawan.mediyo.music.constants.SongSortType
 import com.shrawan.mediyo.music.db.MusicDatabase
 import com.shrawan.mediyo.music.db.entities.PlaylistEntity
-import com.shrawan.mediyo.music.db.entities.Song
-import com.shrawan.mediyo.music.extensions.reversed
 import com.shrawan.mediyo.music.playback.DownloadUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -24,7 +19,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VirtualPlaylistViewModel @Inject constructor(
-    @ApplicationContext context: Context,
     database: MusicDatabase,
     downloadUtil: DownloadUtil,
     savedStateHandle: SavedStateHandle,

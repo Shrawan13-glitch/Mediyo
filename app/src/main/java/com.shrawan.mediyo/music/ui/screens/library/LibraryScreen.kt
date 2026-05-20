@@ -266,7 +266,7 @@ private fun LibraryOverview(
                                     maxLines = 2,
                                 )
                                 Text(
-                                    text = stringResource(R.string.downloaded),
+                                    text = stringResource(R.string.filter_downloaded),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.secondary,
                                 )

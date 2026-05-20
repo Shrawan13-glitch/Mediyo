@@ -1,5 +1,6 @@
 package com.shrawan.mediyo.music.ui.screens.library
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.asPaddingValues
@@ -31,6 +32,7 @@ import com.shrawan.mediyo.music.ui.component.LocalMenuState
 import com.shrawan.mediyo.music.ui.menu.AlbumMenu
 import com.shrawan.mediyo.music.viewmodels.LibraryAlbumsViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryAlbumsScreen(
     navController: NavController,

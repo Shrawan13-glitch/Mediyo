@@ -1,7 +1,6 @@
 package com.shrawan.mediyo.music.ui.screens.playlist
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,10 +32,9 @@ import com.shrawan.mediyo.music.ui.component.EmptyPlaceholder
 import com.shrawan.mediyo.music.ui.component.LocalMenuState
 import com.shrawan.mediyo.music.ui.component.SongListItem
 import com.shrawan.mediyo.music.ui.menu.SongMenu
-import com.shrawan.mediyo.music.ui.utils.backToMain
 import com.shrawan.mediyo.music.viewmodels.VirtualPlaylistViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VirtualPlaylistScreen(
     navController: NavController,
@@ -46,7 +42,6 @@ fun VirtualPlaylistScreen(
     viewModel: VirtualPlaylistViewModel = hiltViewModel(),
 ) {
     val menuState = LocalMenuState.current
-    val haptic = LocalHapticFeedback.current
     val playerConnection = LocalPlayerConnection.current ?: return
 
     val isPlaying by playerConnection.isPlaying.collectAsState()
@@ -103,31 +98,19 @@ fun VirtualPlaylistScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .combinedClickable(
-                                onClick = {
-                                    if (song.id == mediaMetadata?.id) {
-                                        playerConnection.player.togglePlayPause()
-                                    } else {
-                                        playerConnection.playQueue(
-                                            ListQueue(
-                                                title = title,
-                                                items = songs.map { it.toMediaItem() },
-                                                startIndex = index
-                                            )
+                            .clickable {
+                                if (song.id == mediaMetadata?.id) {
+                                    playerConnection.player.togglePlayPause()
+                                } else {
+                                    playerConnection.playQueue(
+                                        ListQueue(
+                                            title = title,
+                                            items = songs.map { it.toMediaItem() },
+                                            startIndex = index
                                         )
-                                    }
-                                },
-                                onLongClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    menuState.show {
-                                        SongMenu(
-                                            originalSong = song,
-                                            navController = navController,
-                                            onDismiss = menuState::dismiss
-                                        )
-                                    }
+                                    )
                                 }
-                            )
+                            }
                             .animateItem()
                     )
                 }
@@ -140,9 +123,6 @@ fun VirtualPlaylistScreen(
                 IconButton(
                     onClick = {
                         navController.navigateUp()
-                    },
-                    onLongClick = {
-                        navController.backToMain()
                     }
                 ) {
                     Icon(
