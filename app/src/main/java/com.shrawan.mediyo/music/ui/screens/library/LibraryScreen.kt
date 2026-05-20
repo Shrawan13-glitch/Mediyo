@@ -5,6 +5,7 @@ package com.shrawan.mediyo.music.ui.screens.library
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -259,6 +261,7 @@ private fun LibraryOverview(
         }
 
         val previewSongs = songs?.take(5) ?: emptyList()
+        val queueAllSongs = stringResource(R.string.queue_all_songs)
         if (previewSongs.isEmpty()) {
             item(key = "songs_empty") {
                 EmptyPlaceholder(
@@ -304,7 +307,7 @@ private fun LibraryOverview(
                                     } else {
                                         playerConnection.playQueue(
                                             ListQueue(
-                                                title = stringResource(R.string.queue_all_songs),
+                                                title = queueAllSongs,
                                                 items = (songs ?: emptyList()).map { it.toMediaItem() },
                                                 startIndex = (songs ?: emptyList()).indexOf(song).coerceAtLeast(0),
                                             )
