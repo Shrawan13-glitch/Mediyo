@@ -4,12 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,7 +14,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,7 +26,6 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -38,7 +33,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -48,24 +42,14 @@ import com.shrawan.mediyo.music.LocalPlayerConnection
 import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_HEADER
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_SONG
-import com.shrawan.mediyo.music.constants.SongFilter
-import com.shrawan.mediyo.music.constants.SongFilterKey
-import com.shrawan.mediyo.music.constants.SongSortDescendingKey
-import com.shrawan.mediyo.music.constants.SongSortType
-import com.shrawan.mediyo.music.constants.SongSortTypeKey
 import com.shrawan.mediyo.music.extensions.toMediaItem
 import com.shrawan.mediyo.music.extensions.togglePlayPause
 import com.shrawan.mediyo.music.playback.queues.ListQueue
-import com.shrawan.mediyo.music.ui.component.ChipsRow
 import com.shrawan.mediyo.music.ui.component.EmptyPlaceholder
-import com.shrawan.mediyo.music.ui.component.HideOnScrollFAB
 import com.shrawan.mediyo.music.ui.component.LocalMenuState
 import com.shrawan.mediyo.music.ui.component.SongListItem
-import com.shrawan.mediyo.music.ui.component.SortHeader
 import com.shrawan.mediyo.music.ui.menu.SongMenu
 import com.shrawan.mediyo.music.ui.menu.SongSelectionMenu
-import com.shrawan.mediyo.music.utils.rememberEnumPreference
-import com.shrawan.mediyo.music.utils.rememberPreference
 import com.shrawan.mediyo.music.viewmodels.LibrarySongsViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -82,10 +66,6 @@ fun LibrarySongsScreen(
 
     val isPlaying by playerConnection.isPlaying.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
-
-    var filter by rememberEnumPreference(SongFilterKey, SongFilter.LIBRARY)
-    val (sortType, onSortTypeChange) = rememberEnumPreference(SongSortTypeKey, SongSortType.CREATE_DATE)
-    val (sortDescending, onSortDescendingChange) = rememberPreference(SongSortDescendingKey, true)
 
     val songs by viewModel.allSongs.collectAsState()
 
@@ -143,56 +123,6 @@ fun LibrarySongsScreen(
                 }
             }
 
-            item(
-                key = "filter",
-                contentType = CONTENT_TYPE_HEADER
-            ) {
-                ChipsRow(
-                    chips = listOf(
-                        SongFilter.LIBRARY to stringResource(R.string.filter_library),
-                        SongFilter.LIKED to stringResource(R.string.filter_liked),
-                        SongFilter.DOWNLOADED to stringResource(R.string.filter_downloaded)
-                    ),
-                    currentValue = filter,
-                    onValueUpdate = { filter = it }
-                )
-            }
-
-            item(
-                key = "header",
-                contentType = CONTENT_TYPE_HEADER
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                ) {
-                    SortHeader(
-                        sortType = sortType,
-                        sortDescending = sortDescending,
-                        onSortTypeChange = onSortTypeChange,
-                        onSortDescendingChange = onSortDescendingChange,
-                        sortTypeText = { sortType ->
-                            when (sortType) {
-                                SongSortType.CREATE_DATE -> R.string.sort_by_create_date
-                                SongSortType.NAME -> R.string.sort_by_name
-                                SongSortType.ARTIST -> R.string.sort_by_artist
-                                SongSortType.PLAY_TIME -> R.string.sort_by_play_time
-                            }
-                        }
-                    )
-
-                    Spacer(Modifier.weight(1f))
-
-                    songs?.let { songs ->
-                        Text(
-                            text = pluralStringResource(R.plurals.n_song, songs.size, songs.size),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                }
-            }
-
             songs?.let { songs ->
                 if (songs.isEmpty()) {
                     item {
@@ -221,8 +151,6 @@ fun LibrarySongsScreen(
                         song = song,
                         isActive = song.id == mediaMetadata?.id,
                         isPlaying = isPlaying,
-                        showLikedIcon = filter != SongFilter.LIKED,
-                        showDownloadIcon = filter != SongFilter.DOWNLOADED,
                         trailingContent = {
                             if (inSelectMode) {
                                 Checkbox(
@@ -279,20 +207,6 @@ fun LibrarySongsScreen(
                 }
             }
         }
-
-        HideOnScrollFAB(
-            visible = !songs.isNullOrEmpty(),
-            lazyListState = lazyListState,
-            icon = R.drawable.shuffle,
-            onClick = {
-                playerConnection.playQueue(
-                    ListQueue(
-                        title = context.getString(R.string.queue_all_songs),
-                        items = songs!!.shuffled().map { it.toMediaItem() },
-                    )
-                )
-            }
-        )
     }
 
     if (inSelectMode) {

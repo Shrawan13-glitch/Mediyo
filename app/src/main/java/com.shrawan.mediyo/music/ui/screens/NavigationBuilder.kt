@@ -16,8 +16,10 @@ import com.shrawan.mediyo.music.ui.screens.artist.ArtistItemsScreen
 import com.shrawan.mediyo.music.ui.screens.artist.ArtistScreen
 import com.shrawan.mediyo.music.ui.screens.artist.ArtistSongsScreen
 import com.shrawan.mediyo.music.ui.screens.library.LibraryScreen
+import com.shrawan.mediyo.music.db.entities.PlaylistEntity
 import com.shrawan.mediyo.music.ui.screens.playlist.LocalPlaylistScreen
 import com.shrawan.mediyo.music.ui.screens.playlist.OnlinePlaylistScreen
+import com.shrawan.mediyo.music.ui.screens.playlist.VirtualPlaylistScreen
 import com.shrawan.mediyo.music.ui.screens.search.OnlineSearchResult
 import com.shrawan.mediyo.music.ui.screens.settings.AboutScreen
 import com.shrawan.mediyo.music.ui.screens.settings.AppearanceSettings
@@ -158,8 +160,13 @@ fun NavGraphBuilder.navigationBuilder(
                 type = NavType.StringType
             }
         )
-    ) {
-        LocalPlaylistScreen(navController, scrollBehavior)
+    ) { backStackEntry ->
+        val playlistId = backStackEntry.arguments?.getString("playlistId")
+        when (playlistId) {
+            PlaylistEntity.LIKED_PLAYLIST_ID, PlaylistEntity.DOWNLOADED_PLAYLIST_ID ->
+                VirtualPlaylistScreen(navController, scrollBehavior)
+            else -> LocalPlaylistScreen(navController, scrollBehavior)
+        }
     }
     composable(
         route = "youtube_browse/{browseId}?params={params}",

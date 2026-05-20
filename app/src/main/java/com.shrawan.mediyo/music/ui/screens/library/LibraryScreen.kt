@@ -56,6 +56,7 @@ import com.shrawan.mediyo.music.LocalPlayerConnection
 import com.shrawan.mediyo.music.db.entities.Album
 import com.shrawan.mediyo.music.db.entities.Artist
 import com.shrawan.mediyo.music.db.entities.Playlist
+import com.shrawan.mediyo.music.db.entities.PlaylistEntity
 import com.shrawan.mediyo.music.db.entities.Song
 import com.shrawan.mediyo.music.extensions.toMediaItem
 import com.shrawan.mediyo.music.extensions.togglePlayPause
@@ -207,7 +208,7 @@ private fun LibraryOverview(
                 ) {
                     item(key = "liked_songs") {
                         Card(
-                            onClick = { onFilterSelected(LibraryFilter.SONGS) },
+                            onClick = { navController.navigate("local_playlist/${PlaylistEntity.LIKED_PLAYLIST_ID}") },
                             modifier = Modifier.width(140.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
@@ -232,6 +233,40 @@ private fun LibraryOverview(
                                 )
                                 Text(
                                     text = pluralStringResource(R.plurals.n_song, likedSongsCount, likedSongsCount),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                )
+                            }
+                        }
+                    }
+
+                    item(key = "downloaded_songs") {
+                        Card(
+                            onClick = { navController.navigate("local_playlist/${PlaylistEntity.DOWNLOADED_PLAYLIST_ID}") },
+                            modifier = Modifier.width(140.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            ),
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.download),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(32.dp),
+                                )
+                                Spacer(Modifier.weight(1f))
+                                Text(
+                                    text = stringResource(R.string.filter_downloaded),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2,
+                                )
+                                Text(
+                                    text = stringResource(R.string.downloaded),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.secondary,
                                 )

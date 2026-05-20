@@ -1,8 +1,6 @@
 package com.shrawan.mediyo.music.ui.screens.library
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,15 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,12 +26,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -46,20 +37,12 @@ import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_HEADER
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_PLAYLIST
-import com.shrawan.mediyo.music.constants.GridCellSize
-import com.shrawan.mediyo.music.constants.GridCellSizeKey
-import com.shrawan.mediyo.music.constants.GridThumbnailHeight
-import com.shrawan.mediyo.music.constants.LibraryViewType
 import com.shrawan.mediyo.music.constants.PlaylistSortDescendingKey
 import com.shrawan.mediyo.music.constants.PlaylistSortType
 import com.shrawan.mediyo.music.constants.PlaylistSortTypeKey
-import com.shrawan.mediyo.music.constants.PlaylistViewTypeKey
-import com.shrawan.mediyo.music.constants.SmallGridThumbnailHeight
 import com.shrawan.mediyo.music.db.entities.PlaylistEntity
 import com.shrawan.mediyo.music.ui.component.EmptyPlaceholder
-import com.shrawan.mediyo.music.ui.component.HideOnScrollFAB
 import com.shrawan.mediyo.music.ui.component.LocalMenuState
-import com.shrawan.mediyo.music.ui.component.PlaylistGridItem
 import com.shrawan.mediyo.music.ui.component.PlaylistListItem
 import com.shrawan.mediyo.music.ui.component.SortHeader
 import com.shrawan.mediyo.music.ui.component.TextFieldDialog
@@ -68,7 +51,6 @@ import com.shrawan.mediyo.music.utils.rememberEnumPreference
 import com.shrawan.mediyo.music.utils.rememberPreference
 import com.shrawan.mediyo.music.viewmodels.LibraryPlaylistsViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryPlaylistsScreen(
     navController: NavController,
@@ -77,28 +59,20 @@ fun LibraryPlaylistsScreen(
 ) {
     val menuState = LocalMenuState.current
     val database = LocalDatabase.current
-    val haptic = LocalHapticFeedback.current
-
     val coroutineScope = rememberCoroutineScope()
 
-    val gridCellSize by rememberEnumPreference(GridCellSizeKey, GridCellSize.SMALL)
-    var viewType by rememberEnumPreference(PlaylistViewTypeKey, LibraryViewType.GRID)
     val (sortType, onSortTypeChange) = rememberEnumPreference(PlaylistSortTypeKey, PlaylistSortType.CREATE_DATE)
     val (sortDescending, onSortDescendingChange) = rememberPreference(PlaylistSortDescendingKey, true)
 
     val playlists by viewModel.allPlaylists.collectAsState()
 
     val lazyListState = rememberLazyListState()
-    val lazyGridState = rememberLazyGridState()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val scrollToTop = backStackEntry?.savedStateHandle?.getStateFlow("scrollToTop", false)?.collectAsState()
 
     LaunchedEffect(scrollToTop?.value) {
         if (scrollToTop?.value == true) {
-            when (viewType) {
-                LibraryViewType.LIST -> lazyListState.animateScrollToItem(0)
-                LibraryViewType.GRID -> lazyGridState.animateScrollToItem(0)
-            }
+            lazyListState.animateScrollToItem(0)
             backStackEntry?.savedStateHandle?.set("scrollToTop", false)
         }
     }
@@ -154,185 +128,126 @@ fun LibraryPlaylistsScreen(
             }
 
             IconButton(
-                onClick = {
-                    viewType = viewType.toggle()
-                },
-                modifier = Modifier.padding(start = 6.dp, end = 6.dp)
+                onClick = { showAddPlaylistDialog = true }
             ) {
                 Icon(
-                    painter = painterResource(
-                        when (viewType) {
-                            LibraryViewType.LIST -> R.drawable.list
-                            LibraryViewType.GRID -> R.drawable.grid_view
-                        }
-                    ),
+                    painter = painterResource(R.drawable.add),
                     contentDescription = null
                 )
             }
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
+    LazyColumn(
+        state = lazyListState,
+        contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
     ) {
-        when (viewType) {
-            LibraryViewType.LIST -> {
-                LazyColumn(
-                    state = lazyListState,
-                    contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
-                ) {
-                    if (filterContent != null) {
-                        item(
-                            key = "library_filter",
-                            contentType = CONTENT_TYPE_HEADER
-                        ) {
-                            filterContent()
-                        }
-                    }
-
-                    item(
-                        key = "header",
-                        contentType = CONTENT_TYPE_HEADER
-                    ) {
-                        headerContent()
-                    }
-
-                    playlists?.let { playlists ->
-                        if (playlists.isEmpty()) {
-                            item {
-                                EmptyPlaceholder(
-                                    icon = R.drawable.queue_music,
-                                    text = stringResource(R.string.library_playlist_empty),
-                                    modifier = Modifier.animateItem()
-                                )
-                            }
-                        }
-
-                        items(
-                            items = playlists,
-                            key = { it.id },
-                            contentType = { CONTENT_TYPE_PLAYLIST }
-                        ) { playlist ->
-                            PlaylistListItem(
-                                playlist = playlist,
-                                trailingContent = {
-                                    IconButton(
-                                        onClick = {
-                                            menuState.show {
-                                                PlaylistMenu(
-                                                    playlist = playlist,
-                                                    coroutineScope = coroutineScope,
-                                                    onDismiss = menuState::dismiss
-                                                )
-                                            }
-                                        }
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.more_vert),
-                                            contentDescription = null
-                                        )
-                                    }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("local_playlist/${playlist.id}")
-                                    }
-                                    .animateItem()
-                            )
-                        }
-                    }
-                }
-
-                HideOnScrollFAB(
-                    lazyListState = lazyListState,
-                    icon = R.drawable.add,
-                    onClick = {
-                        showAddPlaylistDialog = true
-                    }
-                )
-            }
-
-            LibraryViewType.GRID -> {
-                LazyVerticalGrid(
-                    state = lazyGridState,
-                    columns = GridCells.Adaptive(
-                        minSize = when (gridCellSize) {
-                            GridCellSize.SMALL -> SmallGridThumbnailHeight
-                            GridCellSize.BIG -> GridThumbnailHeight
-                        } + 24.dp
-                    ),
-                    contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
-                ) {
-                    if (filterContent != null) {
-                        item(
-                            key = "library_filter",
-                            span = { GridItemSpan(maxLineSpan) },
-                            contentType = CONTENT_TYPE_HEADER
-                        ) {
-                            filterContent()
-                        }
-                    }
-
-                    item(
-                        key = "header",
-                        span = { GridItemSpan(maxLineSpan) },
-                        contentType = CONTENT_TYPE_HEADER
-                    ) {
-                        headerContent()
-                    }
-
-                    playlists?.let { playlists ->
-                        if (playlists.isEmpty()) {
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                EmptyPlaceholder(
-                                    icon = R.drawable.queue_music,
-                                    text = stringResource(R.string.library_playlist_empty),
-                                    modifier = Modifier.animateItem()
-                                )
-                            }
-                        }
-
-                        items(
-                            items = playlists,
-                            key = { it.id },
-                            contentType = { CONTENT_TYPE_PLAYLIST }
-                        ) { playlist ->
-                            PlaylistGridItem(
-                                playlist = playlist,
-                                fillMaxWidth = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("local_playlist/${playlist.id}")
-                                        },
-                                        onLongClick = {
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            menuState.show {
-                                                PlaylistMenu(
-                                                    playlist = playlist,
-                                                    coroutineScope = coroutineScope,
-                                                    onDismiss = menuState::dismiss
-                                                )
-                                            }
-                                        }
-                                    )
-                                    .animateItem()
-                            )
-                        }
-                    }
-                }
-
-                HideOnScrollFAB(
-                    lazyListState = lazyGridState,
-                    icon = R.drawable.add,
-                    onClick = {
-                        showAddPlaylistDialog = true
-                    }
-                )
+        if (filterContent != null) {
+            item(
+                key = "library_filter",
+                contentType = CONTENT_TYPE_HEADER
+            ) {
+                filterContent()
             }
         }
 
+        item(
+            key = "header",
+            contentType = CONTENT_TYPE_HEADER
+        ) {
+            headerContent()
+        }
+
+        item(
+            key = "liked_songs",
+            contentType = CONTENT_TYPE_PLAYLIST
+        ) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.liked_songs)) },
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(R.drawable.favorite),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("local_playlist/${PlaylistEntity.LIKED_PLAYLIST_ID}")
+                    }
+                    .animateItem()
+            )
+        }
+
+        item(
+            key = "downloaded_songs",
+            contentType = CONTENT_TYPE_PLAYLIST
+        ) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.filter_downloaded)) },
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(R.drawable.download),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("local_playlist/${PlaylistEntity.DOWNLOADED_PLAYLIST_ID}")
+                    }
+                    .animateItem()
+            )
+        }
+
+        playlists?.let { playlists ->
+            if (playlists.isEmpty()) {
+                item {
+                    EmptyPlaceholder(
+                        icon = R.drawable.queue_music,
+                        text = stringResource(R.string.library_playlist_empty),
+                        modifier = Modifier.animateItem()
+                    )
+                }
+            }
+
+            items(
+                items = playlists,
+                key = { it.id },
+                contentType = { CONTENT_TYPE_PLAYLIST }
+            ) { playlist ->
+                PlaylistListItem(
+                    playlist = playlist,
+                    trailingContent = {
+                        IconButton(
+                            onClick = {
+                                menuState.show {
+                                    PlaylistMenu(
+                                        playlist = playlist,
+                                        coroutineScope = coroutineScope,
+                                        onDismiss = menuState::dismiss
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.more_vert),
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate("local_playlist/${playlist.id}")
+                        }
+                        .animateItem()
+                )
+            }
+        }
     }
 }
+
+
