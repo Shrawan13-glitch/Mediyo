@@ -294,18 +294,13 @@ class MainActivity : ComponentActivity() {
                     }
                     val tabOpenedFromShortcut = remember {
                         when (intent?.action) {
-                            ACTION_SONGS -> NavigationTab.SONG
-                            ACTION_ALBUMS -> NavigationTab.ALBUM
-                            ACTION_PLAYLISTS -> NavigationTab.PLAYLIST
+                            ACTION_SONGS, ACTION_ALBUMS, ACTION_PLAYLISTS -> NavigationTab.LIBRARY
                             else -> null
                         }
                     }
                     val topLevelScreens = listOf(
                         Screens.Home.route,
-                        Screens.Songs.route,
-                        Screens.Artists.route,
-                        Screens.Albums.route,
-                        Screens.Playlists.route,
+                        Screens.Library.route,
                         "settings"
                     )
 
@@ -497,10 +492,7 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             startDestination = when (tabOpenedFromShortcut ?: defaultOpenTab) {
                                 NavigationTab.HOME -> Screens.Home
-                                NavigationTab.SONG -> Screens.Songs
-                                NavigationTab.ARTIST -> Screens.Artists
-                                NavigationTab.ALBUM -> Screens.Albums
-                                NavigationTab.PLAYLIST -> Screens.Playlists
+                                NavigationTab.LIBRARY -> Screens.Library
                             }.route,
                             enterTransition = {
                                 if (initialState.destination.route in topLevelScreens && targetState.destination.route in topLevelScreens) {

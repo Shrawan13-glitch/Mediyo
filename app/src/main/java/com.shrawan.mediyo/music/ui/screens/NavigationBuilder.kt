@@ -15,10 +15,7 @@ import androidx.navigation.navArgument
 import com.shrawan.mediyo.music.ui.screens.artist.ArtistItemsScreen
 import com.shrawan.mediyo.music.ui.screens.artist.ArtistScreen
 import com.shrawan.mediyo.music.ui.screens.artist.ArtistSongsScreen
-import com.shrawan.mediyo.music.ui.screens.library.LibraryAlbumsScreen
-import com.shrawan.mediyo.music.ui.screens.library.LibraryArtistsScreen
-import com.shrawan.mediyo.music.ui.screens.library.LibraryPlaylistsScreen
-import com.shrawan.mediyo.music.ui.screens.library.LibrarySongsScreen
+import com.shrawan.mediyo.music.ui.screens.library.LibraryScreen
 import com.shrawan.mediyo.music.ui.screens.playlist.LocalPlaylistScreen
 import com.shrawan.mediyo.music.ui.screens.playlist.OnlinePlaylistScreen
 import com.shrawan.mediyo.music.ui.screens.search.OnlineSearchResult
@@ -43,17 +40,8 @@ fun NavGraphBuilder.navigationBuilder(
     composable(Screens.Home.route) {
         HomeScreen(navController)
     }
-    composable(Screens.Songs.route) {
-        LibrarySongsScreen(navController)
-    }
-    composable(Screens.Artists.route) {
-        LibraryArtistsScreen(navController)
-    }
-    composable(Screens.Albums.route) {
-        LibraryAlbumsScreen(navController)
-    }
-    composable(Screens.Playlists.route) {
-        LibraryPlaylistsScreen(navController)
+    composable(Screens.Library.route) {
+        LibraryScreen(navController)
     }
     composable("history") {
         HistoryScreen(navController)
