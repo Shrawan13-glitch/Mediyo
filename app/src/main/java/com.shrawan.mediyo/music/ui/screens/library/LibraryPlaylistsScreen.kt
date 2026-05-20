@@ -73,6 +73,7 @@ import com.shrawan.mediyo.music.viewmodels.LibraryPlaylistsViewModel
 fun LibraryPlaylistsScreen(
     navController: NavController,
     viewModel: LibraryPlaylistsViewModel = hiltViewModel(),
+    filterContent: (@Composable () -> Unit)? = null,
 ) {
     val menuState = LocalMenuState.current
     val database = LocalDatabase.current
@@ -180,6 +181,15 @@ fun LibraryPlaylistsScreen(
                     state = lazyListState,
                     contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
                 ) {
+                    if (filterContent != null) {
+                        item(
+                            key = "library_filter",
+                            contentType = CONTENT_TYPE_HEADER
+                        ) {
+                            filterContent()
+                        }
+                    }
+
                     item(
                         key = "header",
                         contentType = CONTENT_TYPE_HEADER
@@ -254,6 +264,16 @@ fun LibraryPlaylistsScreen(
                     ),
                     contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
                 ) {
+                    if (filterContent != null) {
+                        item(
+                            key = "library_filter",
+                            span = { GridItemSpan(maxLineSpan) },
+                            contentType = CONTENT_TYPE_HEADER
+                        ) {
+                            filterContent()
+                        }
+                    }
+
                     item(
                         key = "header",
                         span = { GridItemSpan(maxLineSpan) },

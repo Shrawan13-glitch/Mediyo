@@ -70,6 +70,7 @@ import com.shrawan.mediyo.music.viewmodels.LibraryArtistsViewModel
 fun LibraryArtistsScreen(
     navController: NavController,
     viewModel: LibraryArtistsViewModel = hiltViewModel(),
+    filterContent: (@Composable () -> Unit)? = null,
 ) {
     val menuState = LocalMenuState.current
     val haptic = LocalHapticFeedback.current
@@ -98,7 +99,7 @@ fun LibraryArtistsScreen(
         }
     }
 
-    val filterContent = @Composable {
+    val chipFilterContent = @Composable {
         Row {
             ChipsRow(
                 chips = listOf(
@@ -170,11 +171,20 @@ fun LibraryArtistsScreen(
                     state = lazyListState,
                     contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
                 ) {
+                    if (filterContent != null) {
+                        item(
+                            key = "library_filter",
+                            contentType = CONTENT_TYPE_HEADER
+                        ) {
+                            filterContent()
+                        }
+                    }
+
                     item(
                         key = "filter",
                         contentType = CONTENT_TYPE_HEADER
                     ) {
-                        filterContent()
+                        chipFilterContent()
                     }
 
                     item(
@@ -242,12 +252,22 @@ fun LibraryArtistsScreen(
                     ),
                     contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
                 ) {
+                    if (filterContent != null) {
+                        item(
+                            key = "library_filter",
+                            span = { GridItemSpan(maxLineSpan) },
+                            contentType = CONTENT_TYPE_HEADER
+                        ) {
+                            filterContent()
+                        }
+                    }
+
                     item(
                         key = "filter",
                         span = { GridItemSpan(maxLineSpan) },
                         contentType = CONTENT_TYPE_HEADER
                     ) {
-                        filterContent()
+                        chipFilterContent()
                     }
 
                     item(

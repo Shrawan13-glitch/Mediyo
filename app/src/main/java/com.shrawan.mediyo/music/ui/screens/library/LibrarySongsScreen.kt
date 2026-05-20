@@ -73,6 +73,7 @@ import com.shrawan.mediyo.music.viewmodels.LibrarySongsViewModel
 fun LibrarySongsScreen(
     navController: NavController,
     viewModel: LibrarySongsViewModel = hiltViewModel(),
+    filterContent: (@Composable () -> Unit)? = null,
 ) {
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
@@ -133,6 +134,15 @@ fun LibrarySongsScreen(
             state = lazyListState,
             contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
         ) {
+            if (filterContent != null) {
+                item(
+                    key = "library_filter",
+                    contentType = CONTENT_TYPE_HEADER
+                ) {
+                    filterContent()
+                }
+            }
+
             item(
                 key = "filter",
                 contentType = CONTENT_TYPE_HEADER

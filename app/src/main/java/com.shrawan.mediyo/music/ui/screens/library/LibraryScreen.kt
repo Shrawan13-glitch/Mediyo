@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,7 +29,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +38,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -102,11 +98,6 @@ fun LibraryScreen(
     val database = LocalDatabase.current
     val likedSongsCount by database.likedSongsCount().collectAsState(initial = 0)
 
-    val menuState = LocalMenuState.current
-    val playerConnection = LocalPlayerConnection.current
-    val haptic = LocalHapticFeedback.current
-    val coroutineScope = rememberCoroutineScope()
-
     val backStackEntry by navController.currentBackStackEntryAsState()
     val scrollToTop = backStackEntry?.savedStateHandle?.getStateFlow("scrollToTop", false)?.collectAsState()
     val lazyListState = rememberLazyListState()
@@ -119,54 +110,57 @@ fun LibraryScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        when (filter) {
-            null -> LibraryOverview(
-                songs = songs,
-                artists = artists,
-                albums = albums,
-                playlists = playlists,
-                likedSongsCount = likedSongsCount,
-                navController = navController,
-                onFilterSelected = { filter = it },
-                lazyListState = lazyListState,
-            )
-
-            LibraryFilter.SONGS -> LibrarySongsScreen(navController)
-            LibraryFilter.ARTISTS -> LibraryArtistsScreen(navController)
-            LibraryFilter.ALBUMS -> LibraryAlbumsScreen(navController)
-            LibraryFilter.PLAYLISTS -> LibraryPlaylistsScreen(navController)
-        }
-
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 2.dp,
+    val filterContent: @Composable () -> Unit = {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState())
         ) {
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
-            ) {
-                Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(12.dp))
 
-                listOf(
-                    LibraryFilter.PLAYLISTS to stringResource(R.string.filter_playlists),
-                    LibraryFilter.SONGS to stringResource(R.string.filter_songs),
-                    LibraryFilter.ALBUMS to stringResource(R.string.filter_albums),
-                    LibraryFilter.ARTISTS to stringResource(R.string.filter_artists),
-                ).forEach { (value, label) ->
-                    FilterChip(
-                        selected = filter == value,
-                        onClick = { filter = if (filter == value) null else value },
-                        label = { Text(label) },
-                    )
-                    Spacer(Modifier.width(8.dp))
-                }
+            listOf(
+                LibraryFilter.PLAYLISTS to stringResource(R.string.filter_playlists),
+                LibraryFilter.SONGS to stringResource(R.string.filter_songs),
+                LibraryFilter.ALBUMS to stringResource(R.string.filter_albums),
+                LibraryFilter.ARTISTS to stringResource(R.string.filter_artists),
+            ).forEach { (value, label) ->
+                FilterChip(
+                    selected = filter == value,
+                    onClick = { filter = if (filter == value) null else value },
+                    label = { Text(label) },
+                )
+                Spacer(Modifier.width(8.dp))
             }
         }
+    }
+
+    when (filter) {
+        null -> LibraryOverview(
+            songs = songs,
+            artists = artists,
+            albums = albums,
+            playlists = playlists,
+            likedSongsCount = likedSongsCount,
+            navController = navController,
+            onFilterSelected = { filter = it },
+            lazyListState = lazyListState,
+            filterContent = filterContent,
+        )
+
+        LibraryFilter.SONGS -> LibrarySongsScreen(
+            navController = navController,
+            filterContent = filterContent,
+        )
+        LibraryFilter.ARTISTS -> LibraryArtistsScreen(
+            navController = navController,
+            filterContent = filterContent,
+        )
+        LibraryFilter.ALBUMS -> LibraryAlbumsScreen(
+            navController = navController,
+            filterContent = filterContent,
+        )
+        LibraryFilter.PLAYLISTS -> LibraryPlaylistsScreen(
+            navController = navController,
+            filterContent = filterContent,
+        )
     }
 }
 
@@ -180,6 +174,7 @@ private fun LibraryOverview(
     navController: NavController,
     onFilterSelected: (LibraryFilter) -> Unit,
     lazyListState: androidx.compose.foundation.lazy.LazyListState,
+    filterContent: @Composable () -> Unit,
 ) {
     val menuState = LocalMenuState.current
     val playerConnection = LocalPlayerConnection.current
@@ -192,6 +187,12 @@ private fun LibraryOverview(
         state = lazyListState,
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
     ) {
+        item(
+            key = "filter_content"
+        ) {
+            filterContent()
+        }
+
         item(
             key = "playlists_carousel"
         ) {
