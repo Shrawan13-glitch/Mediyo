@@ -582,9 +582,6 @@ fun MediaMetadataListItem(
         if (song?.song?.liked == true) {
             Icon.Favorite()
         }
-        if (song?.song?.inLibrary != null) {
-            Icon.Library()
-        }
         val download by LocalDownloadUtil.current.getDownload(song?.id).collectAsState(initial = null)
         Icon.Download(download?.state)
     },
@@ -628,9 +625,6 @@ fun YouTubeListItem(
         }
         if (item.explicit) {
             Icon.Explicit()
-        }
-        if (item is SongItem && song?.song?.inLibrary != null) {
-            Icon.Library()
         }
         if (item is SongItem) {
             val downloads by LocalDownloadUtil.current.downloads.collectAsState()
@@ -680,9 +674,6 @@ fun YouTubeGridItem(
         }
         if (item.explicit) {
             Icon.Explicit()
-        }
-        if (item is SongItem && song?.song?.inLibrary != null) {
-            Icon.Library()
         }
         if (item is SongItem) {
             val downloads by LocalDownloadUtil.current.downloads.collectAsState()

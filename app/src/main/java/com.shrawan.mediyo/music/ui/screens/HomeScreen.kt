@@ -394,7 +394,6 @@ fun HomeScreen(
 
                             SongListItem(
                                 song = song!!,
-                                showInLibraryIcon = true,
                                 isActive = song!!.id == mediaMetadata?.id,
                                 isPlaying = isPlaying,
                                 modifier = Modifier
@@ -404,7 +403,7 @@ fun HomeScreen(
                                             if (song!!.id == mediaMetadata?.id) {
                                                 playerConnection.player.togglePlayPause()
                                             } else {
-                                                playerConnection.playQueue(YouTubeQueue.radio(song!!.toMediaMetadata()))
+                                                playerConnection.playQueue(YouTubeQueue(listOf(song!!.toMediaItem())))
                                             }
                                         },
                                         onLongClick = {
