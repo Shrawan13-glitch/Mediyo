@@ -23,7 +23,7 @@ class VirtualPlaylistViewModel @Inject constructor(
     downloadUtil: DownloadUtil,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val playlistId = savedStateHandle.get<String>("playlistId")!!
+    val playlistId = savedStateHandle.get<String>("playlistId")!!
 
     val title: String = when (playlistId) {
         PlaylistEntity.LIKED_PLAYLIST_ID -> "Liked Songs"

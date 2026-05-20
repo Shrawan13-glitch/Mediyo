@@ -1,33 +1,24 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.shrawan.mediyo.music.ui.screens.library
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,43 +29,32 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shrawan.mediyo.R
-import com.shrawan.mediyo.music.LocalDatabase
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
-import com.shrawan.mediyo.music.LocalPlayerConnection
+import com.shrawan.mediyo.music.constants.ListThumbnailSize
 import com.shrawan.mediyo.music.db.entities.Album
 import com.shrawan.mediyo.music.db.entities.Artist
 import com.shrawan.mediyo.music.db.entities.Playlist
 import com.shrawan.mediyo.music.db.entities.PlaylistEntity
-import com.shrawan.mediyo.music.db.entities.Song
-import com.shrawan.mediyo.music.extensions.toMediaItem
-import com.shrawan.mediyo.music.extensions.togglePlayPause
-import com.shrawan.mediyo.music.playback.queues.ListQueue
-import com.shrawan.mediyo.music.ui.component.AlbumListItem
-import com.shrawan.mediyo.music.ui.component.ArtistListItem
 import com.shrawan.mediyo.music.ui.component.EmptyPlaceholder
 import com.shrawan.mediyo.music.ui.component.LocalMenuState
-import com.shrawan.mediyo.music.ui.component.NavigationTitle
-import com.shrawan.mediyo.music.ui.component.PlaylistGridItem
-import com.shrawan.mediyo.music.ui.component.SongListItem
 import com.shrawan.mediyo.music.ui.menu.AlbumMenu
 import com.shrawan.mediyo.music.ui.menu.ArtistMenu
-import com.shrawan.mediyo.music.ui.menu.SongMenu
+import com.shrawan.mediyo.music.ui.menu.PlaylistMenu
 import com.shrawan.mediyo.music.viewmodels.LibraryAlbumsViewModel
 import com.shrawan.mediyo.music.viewmodels.LibraryArtistsViewModel
 import com.shrawan.mediyo.music.viewmodels.LibraryPlaylistsViewModel
-import com.shrawan.mediyo.music.viewmodels.LibrarySongsViewModel
 
 enum class LibraryFilter {
     PLAYLISTS, SONGS, ALBUMS, ARTISTS
@@ -86,18 +66,13 @@ fun LibraryScreen(
 ) {
     var filter by rememberSaveable { mutableStateOf<LibraryFilter?>(null) }
 
-    val songsViewModel: LibrarySongsViewModel = hiltViewModel()
     val artistsViewModel: LibraryArtistsViewModel = hiltViewModel()
     val albumsViewModel: LibraryAlbumsViewModel = hiltViewModel()
     val playlistsViewModel: LibraryPlaylistsViewModel = hiltViewModel()
 
-    val songs by songsViewModel.allSongs.collectAsState()
     val artists by artistsViewModel.allArtists.collectAsState()
     val albums by albumsViewModel.allAlbums.collectAsState()
     val playlists by playlistsViewModel.allPlaylists.collectAsState()
-
-    val database = LocalDatabase.current
-    val likedSongsCount by database.likedSongsCount().collectAsState(initial = 0)
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val scrollToTop = backStackEntry?.savedStateHandle?.getStateFlow("scrollToTop", false)?.collectAsState()
@@ -135,11 +110,9 @@ fun LibraryScreen(
 
     when (filter) {
         null -> LibraryOverview(
-            songs = songs,
             artists = artists,
             albums = albums,
             playlists = playlists,
-            likedSongsCount = likedSongsCount,
             navController = navController,
             onFilterSelected = { filter = it },
             lazyListState = lazyListState,
@@ -167,22 +140,16 @@ fun LibraryScreen(
 
 @Composable
 private fun LibraryOverview(
-    songs: List<Song>?,
     artists: List<Artist>?,
     albums: List<Album>?,
     playlists: List<Playlist>?,
-    likedSongsCount: Int,
     navController: NavController,
     onFilterSelected: (LibraryFilter) -> Unit,
     lazyListState: androidx.compose.foundation.lazy.LazyListState,
     filterContent: @Composable () -> Unit,
 ) {
     val menuState = LocalMenuState.current
-    val playerConnection = LocalPlayerConnection.current
-    val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
-
-    val queueAllSongs = stringResource(R.string.queue_all_songs)
 
     LazyColumn(
         state = lazyListState,
@@ -195,134 +162,114 @@ private fun LibraryOverview(
         }
 
         item(
-            key = "playlists_carousel"
+            key = "liked_songs",
         ) {
-            Column {
-                NavigationTitle(
-                    title = stringResource(R.string.filter_playlists),
-                )
-
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    item(key = "liked_songs") {
-                        Card(
-                            onClick = { navController.navigate("local_playlist/${PlaylistEntity.LIKED_PLAYLIST_ID}") },
-                            modifier = Modifier.width(140.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.liked_songs)) },
+                supportingContent = { Text(stringResource(R.string.filter_playlists)) },
+                leadingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(ListThumbnailSize)
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                RoundedCornerShape(4.dp)
                             ),
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.favorite),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(32.dp),
-                                )
-                                Spacer(Modifier.weight(1f))
-                                Text(
-                                    text = stringResource(R.string.liked_songs),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 2,
-                                )
-                                Text(
-                                    text = pluralStringResource(R.plurals.n_song, likedSongsCount, likedSongsCount),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                )
-                            }
-                        }
-                    }
-
-                    item(key = "downloaded_songs") {
-                        Card(
-                            onClick = { navController.navigate("local_playlist/${PlaylistEntity.DOWNLOADED_PLAYLIST_ID}") },
-                            modifier = Modifier.width(140.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            ),
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.download),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(32.dp),
-                                )
-                                Spacer(Modifier.weight(1f))
-                                Text(
-                                    text = stringResource(R.string.filter_downloaded),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 2,
-                                )
-                                Text(
-                                    text = stringResource(R.string.filter_downloaded),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                )
-                            }
-                        }
-                    }
-
-                    items(
-                        items = playlists ?: emptyList(),
-                        key = { it.id },
-                    ) { playlist ->
-                        PlaylistGridItem(
-                            playlist = playlist,
-                            modifier = Modifier.clickable {
-                                navController.navigate("local_playlist/${playlist.id}")
-                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.favorite),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("local_playlist/${PlaylistEntity.LIKED_PLAYLIST_ID}")
+                    }
+                    .animateItem()
+            )
+        }
+
+        item(
+            key = "downloaded_songs",
+        ) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.filter_downloaded)) },
+                supportingContent = { Text(stringResource(R.string.filter_playlists)) },
+                leadingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(ListThumbnailSize)
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                RoundedCornerShape(4.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.download),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("local_playlist/${PlaylistEntity.DOWNLOADED_PLAYLIST_ID}")
+                    }
+                    .animateItem()
+            )
+        }
+
+        playlists?.let { playlists ->
+            if (playlists.isEmpty()) {
+                item(
+                    key = "playlists_empty"
+                ) {
+                    EmptyPlaceholder(
+                        icon = R.drawable.queue_music,
+                        text = stringResource(R.string.library_playlist_empty),
+                    )
                 }
             }
-        }
 
-        item(
-            key = "songs_header"
-        ) {
-            NavigationTitle(
-                title = stringResource(R.string.filter_songs),
-                onClick = { onFilterSelected(LibraryFilter.SONGS) },
-            )
-        }
-
-        val previewSongs = songs?.take(5) ?: emptyList()
-        if (previewSongs.isEmpty()) {
-            item(key = "songs_empty") {
-                EmptyPlaceholder(
-                    icon = R.drawable.music_note,
-                    text = stringResource(R.string.library_song_empty),
-                )
-            }
-        } else {
             items(
-                items = previewSongs,
-                key = { it.id },
-                contentType = { "song" },
-            ) { song ->
-                SongListItem(
-                    song = song,
-                    showLikedIcon = true,
-                    showDownloadIcon = true,
+                items = playlists,
+                key = { "playlist_${it.id}" },
+            ) { playlist ->
+                ListItem(
+                    headlineContent = { Text(playlist.playlist.name) },
+                    supportingContent = { Text(stringResource(R.string.filter_playlists)) },
+                    leadingContent = {
+                        Box(
+                            modifier = Modifier
+                                .size(ListThumbnailSize)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                    RoundedCornerShape(4.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.queue_music),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
                     trailingContent = {
                         IconButton(
                             onClick = {
                                 menuState.show {
-                                    SongMenu(
-                                        originalSong = song,
-                                        navController = navController,
+                                    PlaylistMenu(
+                                        playlist = playlist,
+                                        coroutineScope = coroutineScope,
                                         onDismiss = menuState::dismiss,
                                     )
                                 }
@@ -336,64 +283,43 @@ private fun LibraryOverview(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = {
-                                if (playerConnection != null) {
-                                    if (song.id == playerConnection.mediaMetadata.value?.id) {
-                                        playerConnection.player.togglePlayPause()
-                                    } else {
-                                        playerConnection.playQueue(
-                                            ListQueue(
-                                                title = queueAllSongs,
-                                                items = (songs ?: emptyList()).map { it.toMediaItem() },
-                                                startIndex = (songs ?: emptyList()).indexOf(song).coerceAtLeast(0),
-                                            )
-                                        )
-                                    }
-                                }
-                            },
-                            onLongClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                menuState.show {
-                                    SongMenu(
-                                        originalSong = song,
-                                        navController = navController,
-                                        onDismiss = menuState::dismiss,
-                                    )
-                                }
-                            },
-                        )
-                        .animateItem(),
+                        .clickable {
+                            navController.navigate("local_playlist/${playlist.id}")
+                        }
+                        .animateItem()
                 )
             }
         }
 
-        item(
-            key = "albums_header"
-        ) {
-            NavigationTitle(
-                title = stringResource(R.string.filter_albums),
-                onClick = { onFilterSelected(LibraryFilter.ALBUMS) },
-            )
-        }
-
-        val previewAlbums = albums?.take(5) ?: emptyList()
-        if (previewAlbums.isEmpty()) {
-            item(key = "albums_empty") {
-                EmptyPlaceholder(
-                    icon = R.drawable.album,
-                    text = stringResource(R.string.library_album_empty),
-                )
+        albums?.let { albums ->
+            if (albums.isEmpty()) {
+                item(
+                    key = "albums_empty"
+                ) {
+                    EmptyPlaceholder(
+                        icon = R.drawable.album,
+                        text = stringResource(R.string.library_album_empty),
+                    )
+                }
             }
-        } else {
+
             items(
-                items = previewAlbums,
-                key = { it.id },
-                contentType = { "album" },
+                items = albums,
+                key = { "album_${it.id}" },
             ) { album ->
-                AlbumListItem(
-                    album = album,
-                    showLikedIcon = true,
+                ListItem(
+                    headlineContent = { Text(album.album.title) },
+                    supportingContent = { Text(stringResource(R.string.filter_albums)) },
+                    leadingContent = {
+                        AsyncImage(
+                            model = album.album.thumbnailUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(ListThumbnailSize)
+                                .clip(RoundedCornerShape(4.dp))
+                        )
+                    },
                     trailingContent = {
                         IconButton(
                             onClick = {
@@ -414,51 +340,43 @@ private fun LibraryOverview(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = {
-                                navController.navigate("album/${album.id}")
-                            },
-                            onLongClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                menuState.show {
-                                    AlbumMenu(
-                                        originalAlbum = album,
-                                        navController = navController,
-                                        onDismiss = menuState::dismiss,
-                                    )
-                                }
-                            },
-                        )
-                        .animateItem(),
+                        .clickable {
+                            navController.navigate("album/${album.id}")
+                        }
+                        .animateItem()
                 )
             }
         }
 
-        item(
-            key = "artists_header"
-        ) {
-            NavigationTitle(
-                title = stringResource(R.string.filter_artists),
-                onClick = { onFilterSelected(LibraryFilter.ARTISTS) },
-            )
-        }
-
-        val previewArtists = artists?.take(5) ?: emptyList()
-        if (previewArtists.isEmpty()) {
-            item(key = "artists_empty") {
-                EmptyPlaceholder(
-                    icon = R.drawable.artist,
-                    text = stringResource(R.string.library_artist_empty),
-                )
+        artists?.let { artists ->
+            if (artists.isEmpty()) {
+                item(
+                    key = "artists_empty"
+                ) {
+                    EmptyPlaceholder(
+                        icon = R.drawable.artist,
+                        text = stringResource(R.string.library_artist_empty),
+                    )
+                }
             }
-        } else {
+
             items(
-                items = previewArtists,
-                key = { it.id },
-                contentType = { "artist" },
+                items = artists,
+                key = { "artist_${it.id}" },
             ) { artist ->
-                ArtistListItem(
-                    artist = artist,
+                ListItem(
+                    headlineContent = { Text(artist.artist.name) },
+                    supportingContent = { Text(stringResource(R.string.filter_artists)) },
+                    leadingContent = {
+                        AsyncImage(
+                            model = artist.artist.thumbnailUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(ListThumbnailSize)
+                                .clip(CircleShape)
+                        )
+                    },
                     trailingContent = {
                         IconButton(
                             onClick = {
@@ -482,7 +400,7 @@ private fun LibraryOverview(
                         .clickable {
                             navController.navigate("artist/${artist.id}")
                         }
-                        .animateItem(),
+                        .animateItem()
                 )
             }
         }

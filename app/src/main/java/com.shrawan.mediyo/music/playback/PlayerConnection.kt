@@ -120,10 +120,6 @@ class PlayerConnection(
         service.toggleLike()
     }
 
-    fun toggleLibrary() {
-        service.toggleLibrary()
-    }
-
     fun seekToNext() {
         player.seekToNext()
         player.prepare()

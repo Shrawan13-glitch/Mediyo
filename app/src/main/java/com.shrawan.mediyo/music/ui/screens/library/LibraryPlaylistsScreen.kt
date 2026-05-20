@@ -1,5 +1,6 @@
 package com.shrawan.mediyo.music.ui.screens.library
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -38,6 +41,7 @@ import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.R
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_HEADER
 import com.shrawan.mediyo.music.constants.CONTENT_TYPE_PLAYLIST
+import com.shrawan.mediyo.music.constants.ListThumbnailSize
 import com.shrawan.mediyo.music.constants.PlaylistSortDescendingKey
 import com.shrawan.mediyo.music.constants.PlaylistSortType
 import com.shrawan.mediyo.music.constants.PlaylistSortTypeKey
@@ -165,12 +169,24 @@ fun LibraryPlaylistsScreen(
         ) {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.liked_songs)) },
+                supportingContent = { Text(stringResource(R.string.filter_playlists)) },
                 leadingContent = {
-                    Icon(
-                        painter = painterResource(R.drawable.favorite),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(ListThumbnailSize)
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                RoundedCornerShape(4.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.favorite),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -187,12 +203,24 @@ fun LibraryPlaylistsScreen(
         ) {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.filter_downloaded)) },
+                supportingContent = { Text(stringResource(R.string.filter_playlists)) },
                 leadingContent = {
-                    Icon(
-                        painter = painterResource(R.drawable.download),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(ListThumbnailSize)
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                RoundedCornerShape(4.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.download),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

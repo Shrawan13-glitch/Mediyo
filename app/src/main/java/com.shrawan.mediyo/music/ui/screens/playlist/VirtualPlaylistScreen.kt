@@ -1,30 +1,46 @@
 package com.shrawan.mediyo.music.ui.screens.playlist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shrawan.mediyo.music.LocalPlayerAwareWindowInsets
 import com.shrawan.mediyo.music.LocalPlayerConnection
 import com.shrawan.mediyo.R
+import com.shrawan.mediyo.music.constants.AlbumThumbnailSize
+import com.shrawan.mediyo.music.constants.CONTENT_TYPE_HEADER
+import com.shrawan.mediyo.music.constants.ThumbnailCornerRadius
 import com.shrawan.mediyo.music.extensions.toMediaItem
 import com.shrawan.mediyo.music.extensions.togglePlayPause
 import com.shrawan.mediyo.music.playback.queues.ListQueue
@@ -32,6 +48,7 @@ import com.shrawan.mediyo.music.ui.component.EmptyPlaceholder
 import com.shrawan.mediyo.music.ui.component.LocalMenuState
 import com.shrawan.mediyo.music.ui.component.SongListItem
 import com.shrawan.mediyo.music.ui.menu.SongMenu
+import com.shrawan.mediyo.music.utils.makeTimeString
 import com.shrawan.mediyo.music.viewmodels.VirtualPlaylistViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,6 +68,8 @@ fun VirtualPlaylistScreen(
     val songs by viewModel.songs.collectAsState()
     val lazyListState = rememberLazyListState()
 
+    val playlistLength = songs?.sumOf { it.song.duration.coerceAtLeast(0) } ?: 0
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -58,6 +77,60 @@ fun VirtualPlaylistScreen(
             state = lazyListState,
             contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
         ) {
+            item(
+                key = "header",
+                contentType = CONTENT_TYPE_HEADER
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(AlbumThumbnailSize)
+                            .clip(RoundedCornerShape(ThumbnailCornerRadius))
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                when (viewModel.playlistId) {
+                                    com.shrawan.mediyo.music.db.entities.PlaylistEntity.LIKED_PLAYLIST_ID -> R.drawable.favorite
+                                    else -> R.drawable.download
+                                }
+                            ),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = title,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 2,
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+
+                        songs?.let { songs ->
+                            Text(
+                                text = buildString {
+                                    append(pluralStringResource(R.plurals.n_song, songs.size, songs.size))
+                                    append(" · ")
+                                    append(makeTimeString(playlistLength * 1000L))
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+            }
+
             songs?.let { songs ->
                 if (songs.isEmpty()) {
                     item {

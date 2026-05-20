@@ -196,7 +196,6 @@ fun HistoryScreen(
                         song = event.song,
                         isActive = event.song.id == mediaMetadata?.id,
                         isPlaying = isPlaying,
-                        showInLibraryIcon = true,
                         trailingContent = {
                             if (inSelectMode) {
                                 Checkbox(

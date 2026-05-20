@@ -87,16 +87,6 @@ fun AlbumMenu(
     var songs by remember {
         mutableStateOf(emptyList<Song>())
     }
-    val allInLibrary = remember(songs) {
-        songs.all { it.song.inLibrary != null }
-    }
-
-    LaunchedEffect(Unit) {
-        database.albumSongs(album.id).collect {
-            songs = it
-        }
-    }
-
     var downloadState by remember {
         mutableIntStateOf(STATE_STOPPED)
     }
@@ -240,30 +230,6 @@ fun AlbumMenu(
             title = R.string.add_to_playlist
         ) {
             showChoosePlaylistDialog = true
-        }
-
-        if (allInLibrary) {
-            GridMenuItem(
-                icon = R.drawable.library_add_check,
-                title = R.string.remove_all_from_library
-            ) {
-                database.transaction {
-                    songs.forEach {
-                        inLibrary(it.id, null)
-                    }
-                }
-            }
-        } else {
-            GridMenuItem(
-                icon = R.drawable.library_add,
-                title = R.string.add_all_to_library
-            ) {
-                database.transaction {
-                    songs.forEach {
-                        inLibrary(it.id, LocalDateTime.now())
-                    }
-                }
-            }
         }
 
         DownloadGridMenu(

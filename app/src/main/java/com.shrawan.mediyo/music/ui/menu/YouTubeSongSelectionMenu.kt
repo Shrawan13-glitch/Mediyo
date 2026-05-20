@@ -108,19 +108,5 @@ fun YouTubeSongSelectionMenu(
             showChoosePlaylistDialog = true
         }
 
-        GridMenuItem(
-            icon = R.drawable.library_add,
-            title = R.string.add_to_library,
-        ) {
-            database.query {
-                selection.forEach { song ->
-                    insert(song.toMediaMetadata())
-                }
-                selection.forEach { song ->
-                    inLibrary(song.id, LocalDateTime.now())
-                }
-            }
-            onDismiss()
-        }
     }
 }

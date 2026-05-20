@@ -231,13 +231,6 @@ fun Queue(
                     }
                 }
 
-                IconButton(onClick = playerConnection::toggleLibrary) {
-                    Icon(
-                        painter = painterResource(if (currentSong?.song?.inLibrary != null) R.drawable.library_add_check else R.drawable.library_add),
-                        contentDescription = null
-                    )
-                }
-
                 IconButton(
                     onClick = {
                         menuState.show {

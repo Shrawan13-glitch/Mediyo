@@ -249,14 +249,10 @@ fun SongListItem(
     modifier: Modifier = Modifier,
     albumIndex: Int? = null,
     showLikedIcon: Boolean = true,
-    showInLibraryIcon: Boolean = false,
     showDownloadIcon: Boolean = true,
     badges: @Composable RowScope.() -> Unit = {
         if (showLikedIcon && song.song.liked) {
             Icon.Favorite()
-        }
-        if (showInLibraryIcon && song.song.inLibrary != null) {
-            Icon.Library()
         }
         if (showDownloadIcon) {
             val download by LocalDownloadUtil.current.getDownload(song.id).collectAsState(initial = null)
@@ -292,14 +288,10 @@ fun SongGridItem(
     song: Song,
     modifier: Modifier = Modifier,
     showLikedIcon: Boolean = true,
-    showInLibraryIcon: Boolean = false,
     showDownloadIcon: Boolean = true,
     badges: @Composable RowScope.() -> Unit = {
         if (showLikedIcon && song.song.liked) {
             Icon.Favorite()
-        }
-        if (showInLibraryIcon && song.song.inLibrary != null) {
-            Icon.Library()
         }
         if (showDownloadIcon) {
             val download by LocalDownloadUtil.current.getDownload(song.id).collectAsState(initial = null)
@@ -908,17 +900,6 @@ private object Icon {
             painter = painterResource(R.drawable.favorite),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier
-                .size(18.dp)
-                .padding(end = 2.dp)
-        )
-    }
-
-    @Composable
-    fun Library() {
-        Icon(
-            painter = painterResource(R.drawable.library_add_check),
-            contentDescription = null,
             modifier = Modifier
                 .size(18.dp)
                 .padding(end = 2.dp)

@@ -66,7 +66,6 @@ import com.shrawan.mediyo.music.constants.AutoSkipNextOnErrorKey
 import com.shrawan.mediyo.music.constants.DiscordTokenKey
 import com.shrawan.mediyo.music.constants.EnableDiscordRPCKey
 import com.shrawan.mediyo.music.constants.HideExplicitKey
-import com.shrawan.mediyo.music.constants.MediaSessionConstants.CommandToggleLibrary
 import com.shrawan.mediyo.music.constants.MediaSessionConstants.CommandToggleLike
 import com.shrawan.mediyo.music.constants.MediaSessionConstants.CommandToggleRepeatMode
 import com.shrawan.mediyo.music.constants.MediaSessionConstants.CommandToggleShuffle
@@ -226,7 +225,6 @@ class MusicService : MediaLibraryService(),
             }
         mediaLibrarySessionCallback.apply {
             toggleLike = ::toggleLike
-            toggleLibrary = ::toggleLibrary
         }
         mediaSession = MediaLibrarySession.Builder(this, player, mediaLibrarySessionCallback)
             .setSessionActivity(
@@ -362,12 +360,6 @@ class MusicService : MediaLibraryService(),
         mediaSession.setCustomLayout(
             listOf(
                 CommandButton.Builder()
-                    .setDisplayName(getString(if (currentSong.value?.song?.inLibrary != null) R.string.remove_from_library else R.string.add_to_library))
-                    .setIconResId(if (currentSong.value?.song?.inLibrary != null) R.drawable.library_add_check else R.drawable.library_add)
-                    .setSessionCommand(CommandToggleLibrary)
-                    .setEnabled(currentSong.value != null)
-                    .build(),
-                CommandButton.Builder()
                     .setDisplayName(getString(if (currentSong.value?.song?.liked == true) R.string.action_remove_like else R.string.action_like))
                     .setIconResId(if (currentSong.value?.song?.liked == true) R.drawable.favorite else R.drawable.favorite_border)
                     .setSessionCommand(CommandToggleLike)
@@ -491,14 +483,6 @@ class MusicService : MediaLibraryService(),
     fun addToQueue(items: List<MediaItem>) {
         player.addMediaItems(items)
         player.prepare()
-    }
-
-    fun toggleLibrary() {
-        database.query {
-            currentSong.value?.let {
-                update(it.song.toggleLibrary())
-            }
-        }
     }
 
     fun toggleLike() {

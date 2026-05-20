@@ -45,13 +45,11 @@ class MediaLibrarySessionCallback @Inject constructor(
 ) : MediaLibrarySession.Callback {
     private val scope = CoroutineScope(Dispatchers.Main) + Job()
     var toggleLike: () -> Unit = {}
-    var toggleLibrary: () -> Unit = {}
 
     override fun onConnect(session: MediaSession, controller: MediaSession.ControllerInfo): MediaSession.ConnectionResult {
         val connectionResult = super.onConnect(session, controller)
         return MediaSession.ConnectionResult.accept(
             connectionResult.availableSessionCommands.buildUpon()
-                .add(MediaSessionConstants.CommandToggleLibrary)
                 .add(MediaSessionConstants.CommandToggleLike)
                 .add(MediaSessionConstants.CommandToggleShuffle)
                 .add(MediaSessionConstants.CommandToggleRepeatMode)
@@ -68,7 +66,6 @@ class MediaLibrarySessionCallback @Inject constructor(
     ): ListenableFuture<SessionResult> {
         when (customCommand.customAction) {
             MediaSessionConstants.ACTION_TOGGLE_LIKE -> toggleLike()
-            MediaSessionConstants.ACTION_TOGGLE_LIBRARY -> toggleLibrary()
             MediaSessionConstants.ACTION_TOGGLE_SHUFFLE -> session.player.shuffleModeEnabled = !session.player.shuffleModeEnabled
             MediaSessionConstants.ACTION_TOGGLE_REPEAT_MODE -> session.player.toggleRepeatMode()
         }
