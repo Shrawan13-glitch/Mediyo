@@ -403,7 +403,7 @@ fun HomeScreen(
                                             if (song!!.id == mediaMetadata?.id) {
                                                 playerConnection.player.togglePlayPause()
                                             } else {
-                                                playerConnection.playQueue(YouTubeQueue(listOf(song!!.toMediaItem())))
+                                                playerConnection.playQueue(YouTubeQueue(WatchEndpoint(song!!.id), song!!.toMediaMetadata()))
                                             }
                                         },
                                         onLongClick = {
