@@ -43,9 +43,12 @@ fun YouTubeArtistMenu(
             IconButton(
                 onClick = {
                     database.query {
-                        val libraryArtist = libraryArtist
-                        if (libraryArtist != null) {
-                            update(libraryArtist.artist.toggleLike())
+                        val existing = libraryArtist
+                        if (existing != null) {
+                            update(existing.artist.copy(
+                                bookmarkedAt = if (existing.artist.bookmarkedAt != null) null else LocalDateTime.now(),
+                                thumbnailUrl = artist.thumbnail
+                            ))
                         } else {
                             insert(
                                 ArtistEntity(

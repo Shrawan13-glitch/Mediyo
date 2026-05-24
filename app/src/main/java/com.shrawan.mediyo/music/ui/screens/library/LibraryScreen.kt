@@ -48,7 +48,6 @@ import com.shrawan.mediyo.music.db.entities.Album
 import com.shrawan.mediyo.music.db.entities.Artist
 import com.shrawan.mediyo.music.db.entities.Playlist
 import com.shrawan.mediyo.music.db.entities.PlaylistEntity
-import com.shrawan.mediyo.music.ui.component.EmptyPlaceholder
 import com.shrawan.mediyo.music.ui.component.LocalMenuState
 import com.shrawan.mediyo.music.ui.menu.AlbumMenu
 import com.shrawan.mediyo.music.ui.menu.ArtistMenu
@@ -229,17 +228,6 @@ private fun LibraryOverview(
         }
 
         playlists?.let { playlists ->
-            if (playlists.isEmpty()) {
-                item(
-                    key = "playlists_empty"
-                ) {
-                    EmptyPlaceholder(
-                        icon = R.drawable.queue_music,
-                        text = stringResource(R.string.library_playlist_empty),
-                    )
-                }
-            }
-
             items(
                 items = playlists,
                 key = { "playlist_${it.id}" },
@@ -293,17 +281,6 @@ private fun LibraryOverview(
         }
 
         albums?.let { albums ->
-            if (albums.isEmpty()) {
-                item(
-                    key = "albums_empty"
-                ) {
-                    EmptyPlaceholder(
-                        icon = R.drawable.album,
-                        text = stringResource(R.string.library_album_empty),
-                    )
-                }
-            }
-
             items(
                 items = albums,
                 key = { "album_${it.id}" },
@@ -350,17 +327,6 @@ private fun LibraryOverview(
         }
 
         artists?.let { artists ->
-            if (artists.isEmpty()) {
-                item(
-                    key = "artists_empty"
-                ) {
-                    EmptyPlaceholder(
-                        icon = R.drawable.artist,
-                        text = stringResource(R.string.library_artist_empty),
-                    )
-                }
-            }
-
             items(
                 items = artists,
                 key = { "artist_${it.id}" },

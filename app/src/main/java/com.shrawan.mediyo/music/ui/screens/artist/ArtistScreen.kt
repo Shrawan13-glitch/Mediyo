@@ -437,7 +437,10 @@ fun ArtistScreen(
                     database.transaction {
                         val artist = libraryArtist?.artist
                         if (artist != null) {
-                            update(artist.toggleLike())
+                            update(artist.copy(
+                                bookmarkedAt = if (artist.bookmarkedAt != null) null else LocalDateTime.now(),
+                                thumbnailUrl = artistPage?.artist?.thumbnail?.resize(544, 544) ?: artist.thumbnailUrl
+                            ))
                         } else {
                             artistPage?.artist?.let {
                                 insert(
