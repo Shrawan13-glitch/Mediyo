@@ -345,10 +345,8 @@ object YouTube {
                 songCountText = header.secondSubtitle?.runs?.firstOrNull()?.text,
                 thumbnail = header.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.lastOrNull()?.url!!,
                 playEndpoint = null,
-                shuffleEndpoint = header.buttons?.lastOrNull()?.menuRenderer?.items?.firstOrNull()?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint!!,
-                radioEndpoint = header.buttons.lastOrNull()?.menuRenderer?.items!!.find {
-                    it.menuNavigationItemRenderer?.icon?.iconType == "MIX"
-                }?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint!!
+                shuffleEndpoint = header.buttons.shufflePlaylistEndpoint(),
+                radioEndpoint = header.buttons.radioPlaylistEndpoint()
             ),
             songs = response.playlistShelfContents()?.mapNotNull {
                 it.musicResponsiveListItemRenderer?.let(PlaylistPage::fromMusicResponsiveListItemRenderer)
@@ -373,6 +371,21 @@ object YouTube {
             continuation = response.continuationToken()
         )
     }
+
+    private fun List<BrowseResponse.Header.Buttons>?.shufflePlaylistEndpoint(): WatchEndpoint? =
+        this?.firstNotNullOfOrNull {
+            it.buttonRenderer?.takeIf { b -> b.icon?.iconType == "MUSIC_SHUFFLE" }
+                ?.navigationEndpoint?.watchPlaylistEndpoint
+        } ?: this?.flatMap { it.menuRenderer?.items.orEmpty() }
+            ?.firstNotNullOfOrNull {
+                it.menuNavigationItemRenderer?.takeIf { i -> i.icon?.iconType == "MUSIC_SHUFFLE" }
+                    ?.navigationEndpoint?.watchPlaylistEndpoint
+            }
+
+    private fun List<BrowseResponse.Header.Buttons>?.radioPlaylistEndpoint(): WatchEndpoint? =
+        this?.flatMap { it.menuRenderer?.items.orEmpty() }
+            ?.find { it.menuNavigationItemRenderer?.icon?.iconType == "MIX" }
+            ?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint
 
     private fun BrowseResponse.playlistShelfContents(): List<MusicShelfRenderer.Content>? {
         val section = contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents?.firstOrNull()

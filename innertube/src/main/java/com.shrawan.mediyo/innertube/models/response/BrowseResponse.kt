@@ -132,6 +132,7 @@ data class BrowseResponse(
         @Serializable
         data class Buttons(
             val menuRenderer: Menu.MenuRenderer?,
+            val buttonRenderer: Button.ButtonRenderer? = null,
         )
 
         @Serializable
