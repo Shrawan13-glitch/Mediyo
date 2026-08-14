@@ -8,9 +8,22 @@ suspend fun Result<PlaylistPage>.completed() = runCatching {
     val page = getOrThrow()
     val songs = page.songs.toMutableList()
     var continuation = page.songsContinuation
-    while (continuation != null) {
+    val seenContinuations = mutableSetOf<String>()
+    var requestCount = 0
+    val maxRequests = 50
+    var consecutiveEmptyResponses = 0
+    while (continuation != null && requestCount < maxRequests) {
+        if (continuation in seenContinuations) break
+        seenContinuations.add(continuation)
+        requestCount++
         val continuationPage = YouTube.playlistContinuation(continuation).getOrNull() ?: break
-        songs += continuationPage.songs
+        if (continuationPage.songs.isEmpty()) {
+            consecutiveEmptyResponses++
+            if (consecutiveEmptyResponses >= 2) break
+        } else {
+            consecutiveEmptyResponses = 0
+            songs += continuationPage.songs
+        }
         continuation = continuationPage.continuation
     }
     PlaylistPage(
