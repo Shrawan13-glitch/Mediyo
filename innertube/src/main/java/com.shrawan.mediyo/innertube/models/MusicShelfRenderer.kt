@@ -1,6 +1,7 @@
 package com.shrawan.mediyo.innertube.models
 
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 @Serializable
 data class MusicShelfRenderer(
@@ -20,6 +21,7 @@ data class MusicShelfRenderer(
 fun List<MusicShelfRenderer.Content>.getItems(): List<MusicResponsiveListItemRenderer> =
     mapNotNull { it.musicResponsiveListItemRenderer }
 
+@JvmName("getShelfContentContinuation")
 fun List<MusicShelfRenderer.Content>.getContinuation(): String? =
     firstOrNull { it.continuationItemRenderer != null }
         ?.continuationItemRenderer
