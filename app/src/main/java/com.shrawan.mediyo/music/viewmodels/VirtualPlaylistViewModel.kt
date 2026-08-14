@@ -9,6 +9,7 @@ import com.shrawan.mediyo.music.constants.SongSortType
 import com.shrawan.mediyo.music.db.MusicDatabase
 import com.shrawan.mediyo.music.db.entities.PlaylistEntity
 import com.shrawan.mediyo.music.models.toMediaMetadata
+import com.shrawan.mediyo.innertube.utils.completed
 import com.shrawan.mediyo.music.playback.DownloadUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
