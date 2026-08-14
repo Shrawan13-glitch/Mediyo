@@ -131,7 +131,6 @@ dependencies {
     implementation(projects.innertube)
     implementation(projects.kugou)
     implementation(projects.lrclib)
-    implementation(projects.kizzy)
 
     implementation(libs.ktor.client.core)
 

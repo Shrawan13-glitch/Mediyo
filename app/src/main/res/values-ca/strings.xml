@@ -215,9 +215,7 @@
     <string name="action_restore">Restaura</string>
     <string name="imported_playlist">Llista importada</string>
     <string name="hide_explicit">Amaga el contingut explícit</string>
-    <string name="backup_restore">Còpia de seguretat i restauració</string>
-    <string name="discord_integration">Integració amb el Discord</string>
-    <string name="options">Opcions</string>
+    <string name="backup_restore">Còpia de seguretat i restauració</string>    <string name="options">Opcions</string>
     <string name="backup_create_failed">No s’ha pogut crear la còpia de seguretat</string>
     <string name="restore_failed">No s’ha pogut restaurar la còpia de seguretat</string>
     <string name="backup_create_success">S’ha creat la còpia de seguretat satisfactòriament</string>

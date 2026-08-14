@@ -75,11 +75,6 @@
 -keep class com.github.houbb.opencc4j.** { *; }
 -dontwarn com.huaban.analysis.jieba.JiebaSegmenter
 
-# Keep Data data classes
--keep class com.my.kizzy.remote.** { <fields>; }
-# Keep Gateway data classes
--keep class com.my.kizzy.gateway.entities.** { <fields>; }
-
 # jsoup (re2j)
 -keep class com.google.re2j.** { *; }
 -dontwarn com.google.re2j.**
