@@ -14,6 +14,7 @@ import com.shrawan.mediyo.music.playback.DownloadUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -24,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VirtualPlaylistViewModel @Inject constructor(
-    database: MusicDatabase,
+    private val database: MusicDatabase,
     downloadUtil: DownloadUtil,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -55,31 +56,32 @@ class VirtualPlaylistViewModel @Inject constructor(
 
     init {
         if (playlistId == PlaylistEntity.LIKED_PLAYLIST_ID) {
-            syncLikedSongs()
-        }
-    }
+            viewModelScope.launch(Dispatchers.IO) {
+                if (YouTube.cookie != null) {
+                    val result = YouTube.playlist("LM").completed()
+                    if (result.isSuccess) {
+                        val remoteSongs = result.getOrThrow().songs
+                        val remoteIds = remoteSongs.mapTo(mutableSetOf()) { it.id }
+                        val now = LocalDateTime.now()
 
-    private fun syncLikedSongs() {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (YouTube.cookie == null) return@launch
-            val page = YouTube.playlist("LM").completed().getOrNull() ?: return@launch
-            val remoteSongs = page.songs
-            val remoteIds = remoteSongs.mapTo(mutableSetOf()) { it.id }
-            val now = LocalDateTime.now()
-            database.likedSongEntities().forEach { localSong ->
-                if (localSong.id !in remoteIds) {
-                    database.update(localSong.copy(liked = false))
-                }
-            }
-            remoteSongs.forEachIndexed { index, song ->
-                val timestamp = now.minusSeconds(index.toLong())
-                val existing = database.songEntity(song.id)
-                if (existing == null) {
-                    database.insert(song.toMediaMetadata()) {
-                        it.copy(liked = true, inLibrary = timestamp)
+                        database.likedSongs(SongSortType.CREATE_DATE, true).first().forEach { song ->
+                            if (song.song.id !in remoteIds) {
+                                database.update(song.song.copy(liked = false))
+                            }
+                        }
+
+                        remoteSongs.forEachIndexed { index, song ->
+                            val timestamp = now.minusSeconds(index.toLong())
+                            val existing = database.song(song.id).first()
+                            if (existing == null) {
+                                database.insert(song.toMediaMetadata()) {
+                                    it.copy(liked = true, inLibrary = timestamp)
+                                }
+                            } else {
+                                database.update(existing.song.copy(liked = true, inLibrary = timestamp))
+                            }
+                        }
                     }
-                } else {
-                    database.update(existing.copy(liked = true, inLibrary = timestamp))
                 }
             }
         }
