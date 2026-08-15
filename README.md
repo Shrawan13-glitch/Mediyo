@@ -118,18 +118,6 @@ workflow.
 | Lyrics         | LrcLib · Kugou providers                          |
 | Build          | Gradle (Kotlin DSL) · KSP / KAPT · R8             |
 
-## FAQ
-
-### How do I scrobble music to Last.fm, LibreFM, ListenBrainz, or GNU FM?
-
-Use a scrobbler app such as [Pano Scrobbler](https://play.google.com/store/apps/details?id=com.arn.scrobble).
-
-### Why isn't Mediyo showing in Android Auto?
-
-1. Open Android Auto settings and tap the version repeatedly to enable developer settings.
-2. Open the overflow menu (top-right) and select **Developer settings**.
-3. Enable **Unknown sources**.
-
 ## Disclaimer
 
 This project and its contents are not affiliated with, funded, authorized, endorsed by, or in any
