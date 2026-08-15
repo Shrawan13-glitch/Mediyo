@@ -48,7 +48,6 @@ self-hosted, and does not rely on any official YouTube API.
 
 ### Lyrics
 - Synchronized lyrics with automatic source fallback
-- Built-in lyrics translator
 
 ### Personalization & more
 - Dynamic **Material You** theming and appearance settings
@@ -74,24 +73,14 @@ self-hosted, and does not rely on any official YouTube API.
 
 ## Build & Download
 
-Mediyo ships in two flavors:
-
-| Flavor | Description |
-| ------ | ----------- |
-| `foss` | No Google services — the default for privacy-conscious users |
-| `full` | Includes Firebase, Crashlytics, and ML Kit translation support |
-
 ### From the source
 
 ```bash
-# Debug build (FOSS flavor)
+# Debug build
 ./gradlew assembleFossDebug
 
-# Release build (FOSS flavor)
+# Release build
 ./gradlew assembleFossRelease
-
-# Debug build (Full flavor)
-./gradlew assembleFullDebug
 ```
 
 Signed APKs from CI are attached to every run of the

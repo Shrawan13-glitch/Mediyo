@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-val isFullBuild: Boolean by rootProject.extra
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -9,12 +7,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.compose.compiler)
-}
-
-if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
-    apply(plugin = "com.google.gms.google-services")
-    apply(plugin = "com.google.firebase.crashlytics")
-    apply(plugin = "com.google.firebase.firebase-perf")
 }
 
 android {
@@ -43,9 +35,6 @@ android {
     }
     flavorDimensions += "version"
     productFlavors {
-        create("full") {
-            dimension = "version"
-        }
         create("foss") {
             dimension = "version"
         }
@@ -135,15 +124,6 @@ dependencies {
     implementation(libs.ktor.client.core)
 
     coreLibraryDesugaring(libs.desugaring)
-
-    "fullImplementation"(platform(libs.firebase.bom))
-    "fullImplementation"(libs.firebase.analytics)
-    "fullImplementation"(libs.firebase.crashlytics)
-    "fullImplementation"(libs.firebase.config)
-    "fullImplementation"(libs.firebase.perf)
-    "fullImplementation"(libs.mlkit.language.id)
-    "fullImplementation"(libs.mlkit.translate)
-    "fullImplementation"(libs.opencc4j)
 
     implementation(libs.timber)
 }
